@@ -2,8 +2,8 @@ import argparse
 import os
 import sys
 from dotenv import load_dotenv
-import transcriber
-import file_ops
+from scripts import transcriber
+from scripts import file_ops
 
 # Load environment variables (for API Key if in .env)
 load_dotenv()
