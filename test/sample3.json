@@ -1,8 +1,8 @@
 {
     "FileName": "sample3.wav",
     "FileExtension": ".wav",
-    "DateCreated": "2026-01-29T20:14:51.009186",
-    "DateModified": "2026-01-29T20:14:51.009186",
+    "DateCreated": "2026-01-29T16:31:33.668430",
+    "DateModified": "2026-01-29T15:52:08.827707",
     "FileSize": 956730,
     "LengthOfAudio": "00:00:19",
     "Speakers": [
@@ -15,7 +15,7 @@
             "Start": "00:00:00",
             "Stop": "00:00:07",
             "Text": "We're seeing a noticeable shift in consumer preferences across several sectors. What seems to be driving this change?",
-            "Emotion": "Inquisitive",
+            "Emotion": "Serious",
             "PrimaryEmotion": "Neutral",
             "Language": "en-US"
         },
@@ -24,19 +24,29 @@
             "Start": "00:00:07",
             "Stop": "00:00:19",
             "Text": "[laughter] It appears to be a combination of factors, including greater awareness of sustainability issues and a growing demand for personalized experiences.",
-            "Emotion": "Cheerful",
+            "Emotion": "Informative",
             "PrimaryEmotion": "Joy",
             "Language": "en-US"
         }
     ],
-    "Summary": "A brief discussion between two individuals about the reasons behind changing consumer preferences, focusing on sustainability and personalization.",
+    "Summary": "Two speakers discuss the reasons behind changing consumer preferences, citing sustainability and personalization as key factors.",
+    "Topics": [
+        {
+            "Start": "00:00:00",
+            "Text": "Discussion on shifting consumer preferences across various sectors"
+        },
+        {
+            "Start": "00:00:07",
+            "Text": "Sustainability and personalization as key drivers of change in consumer behavior"
+        }
+    ],
     "Publications": {
         "YouTube": {
-            "Title": "Why Consumer Habits Are Changing: The Rise of Sustainability & Personalization",
-            "Description": "In this video, we explore the significant shifts in consumer preferences that are reshaping industries today. From the surge in sustainability awareness to the growing demand for bespoke experiences, we break down what is driving these global market trends.\n\nSummary:\nLearn about the two primary factors influencing modern buyer behavior and how brands are adapting to stay relevant.\n\nURLs:\nNone provided in the transcript.\n\nHashtags:\n#ConsumerTrends #Sustainability #Personalization #MarketingInsights #MarketAnalysis"
+            "Title": "Why Consumer Preferences are Shifting: Sustainability & Personalization Explained",
+            "Description": "Discover the driving forces behind the latest shifts in consumer behavior. We explore how sustainability awareness and the demand for personalized experiences are reshaping the industry.\n\nSummary\nThis video breaks down the core reasons behind modern market shifts, highlighting the critical role of eco-consciousness and tailored customer journeys.\n\nURLs\n- No URLs mentioned in transcript\n\n#ConsumerTrends #Sustainability #Marketing2024 #Personalization #BusinessGrowth"
         },
         "Facebook": {
-            "Post": "The way we shop is changing! 🌍✨ We're seeing a massive shift in what people value most: sustainability and personalized experiences. It’s no longer just about the transaction; it’s about aligning with values and feeling seen as an individual. How is your brand evolving to meet these new expectations? Let's talk about it in the comments below!\n\n#ConsumerBehavior #EcoFriendly #PersonalizedMarketing"
+            "Post": "Consumer habits are evolving faster than ever! 🌍✨ We are seeing a massive shift toward sustainability and personalized experiences. It is no longer just about the product; it is about the values behind the brand and the way they make us feel as individuals. This shift is redefining how successful brands connect with their communities. What is one brand you stick with because of their mission? Let us know below! #ConsumerBehavior #Sustainability #MarketTrends"
         },
         "Review": {
             "TranscriptFile": "sample3_review.md"
