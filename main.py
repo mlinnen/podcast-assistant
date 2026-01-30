@@ -53,9 +53,7 @@ def main():
         dialogue_text = extract_text.extract_dialogue_from_data(final_output)
         if dialogue_text:
             marketing_content = marketing_generator.generate_marketing_content(dialogue_text, api_key, args.model)
-            final_output["Publications"] = {
-                "YouTube": marketing_content
-            }
+            final_output["Publications"] = marketing_content
         
         # 5. Save Results
         output_dir = file_ops.create_output_directory()
