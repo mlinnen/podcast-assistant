@@ -57,7 +57,7 @@ def main():
             final_output["Publications"] = marketing_content
         
         # Create output directory once for all subsequent file operations
-        output_dir = file_ops.create_output_directory()
+        output_dir = file_ops.create_output_directory(audio_path)
 
         # 5. Export Transcript Review Document
         print("Exporting review document...")

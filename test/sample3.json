@@ -4,7 +4,7 @@
     "DateCreated": "2026-01-29T20:14:51.009186",
     "DateModified": "2026-01-29T20:14:51.009186",
     "FileSize": 956730,
-    "LengthOfAudio": "00:00:20",
+    "LengthOfAudio": "00:00:19",
     "Speakers": [
         "Speaker 1",
         "Speaker 2"
@@ -15,19 +15,31 @@
             "Start": "00:00:00",
             "Stop": "00:00:07",
             "Text": "We're seeing a noticeable shift in consumer preferences across several sectors. What seems to be driving this change?",
-            "Emotion": "Professional",
+            "Emotion": "Inquisitive",
             "PrimaryEmotion": "Neutral",
             "Language": "en-US"
         },
         {
             "Speaker": "Speaker 2",
             "Start": "00:00:07",
-            "Stop": "00:00:20",
+            "Stop": "00:00:19",
             "Text": "[laughter] It appears to be a combination of factors, including greater awareness of sustainability issues and a growing demand for personalized experiences.",
-            "Emotion": "Laughing",
+            "Emotion": "Cheerful",
             "PrimaryEmotion": "Joy",
             "Language": "en-US"
         }
     ],
-    "Summary": "Two individuals discuss the shifting landscape of consumer preferences, identifying sustainability and personalized experiences as the primary drivers of this change."
+    "Summary": "A brief discussion between two individuals about the reasons behind changing consumer preferences, focusing on sustainability and personalization.",
+    "Publications": {
+        "YouTube": {
+            "Title": "Why Consumer Habits Are Changing: The Rise of Sustainability & Personalization",
+            "Description": "In this video, we explore the significant shifts in consumer preferences that are reshaping industries today. From the surge in sustainability awareness to the growing demand for bespoke experiences, we break down what is driving these global market trends.\n\nSummary:\nLearn about the two primary factors influencing modern buyer behavior and how brands are adapting to stay relevant.\n\nURLs:\nNone provided in the transcript.\n\nHashtags:\n#ConsumerTrends #Sustainability #Personalization #MarketingInsights #MarketAnalysis"
+        },
+        "Facebook": {
+            "Post": "The way we shop is changing! 🌍✨ We're seeing a massive shift in what people value most: sustainability and personalized experiences. It’s no longer just about the transaction; it’s about aligning with values and feeling seen as an individual. How is your brand evolving to meet these new expectations? Let's talk about it in the comments below!\n\n#ConsumerBehavior #EcoFriendly #PersonalizedMarketing"
+        },
+        "Review": {
+            "TranscriptFile": "sample3_review.md"
+        }
+    }
 }

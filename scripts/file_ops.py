@@ -14,14 +14,17 @@ def get_file_metadata(file_path):
         "FileSize": stats.st_size
     }
 
-def create_output_directory(base_out_dir="out"):
-    """Creates a timestamped output directory."""
+def create_output_directory(audio_file_path, base_out_dir="out"):
+    """Creates an output directory named after the audio file."""
     if not os.path.exists(base_out_dir):
         os.makedirs(base_out_dir)
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join(base_out_dir, timestamp)
-    os.makedirs(output_dir)
+    folder_name = os.path.splitext(os.path.basename(audio_file_path))[0]
+    output_dir = os.path.join(base_out_dir, folder_name)
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
     return output_dir
 
 def save_results(output_dir, audio_file_path, data):
