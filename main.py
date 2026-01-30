@@ -6,6 +6,7 @@ from scripts import transcriber
 from scripts import file_ops
 from scripts import extract_text
 from scripts import marketing_generator
+from scripts import transcript_exporter
 
 # Load environment variables (for API Key if in .env)
 load_dotenv()
@@ -55,8 +56,20 @@ def main():
             marketing_content = marketing_generator.generate_marketing_content(dialogue_text, api_key, args.model)
             final_output["Publications"] = marketing_content
         
-        # 5. Save Results
+        # Create output directory once for all subsequent file operations
         output_dir = file_ops.create_output_directory()
+
+        # 5. Export Transcript Review Document
+        print("Exporting review document...")
+        review_file = transcript_exporter.export_review_document(final_output, output_dir)
+        
+        if "Publications" not in final_output:
+            final_output["Publications"] = {}
+        final_output["Publications"]["Review"] = {
+            "TranscriptFile": review_file
+        }
+        
+        # 6. Save Results
         json_path = file_ops.save_results(output_dir, audio_path, final_output)
         
         print(f"Success! Results saved to {output_dir}")

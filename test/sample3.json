@@ -1,0 +1,33 @@
+{
+    "FileName": "sample3.wav",
+    "FileExtension": ".wav",
+    "DateCreated": "2026-01-29T20:14:51.009186",
+    "DateModified": "2026-01-29T20:14:51.009186",
+    "FileSize": 956730,
+    "LengthOfAudio": "00:00:20",
+    "Speakers": [
+        "Speaker 1",
+        "Speaker 2"
+    ],
+    "Dialog": [
+        {
+            "Speaker": "Speaker 1",
+            "Start": "00:00:00",
+            "Stop": "00:00:07",
+            "Text": "We're seeing a noticeable shift in consumer preferences across several sectors. What seems to be driving this change?",
+            "Emotion": "Professional",
+            "PrimaryEmotion": "Neutral",
+            "Language": "en-US"
+        },
+        {
+            "Speaker": "Speaker 2",
+            "Start": "00:00:07",
+            "Stop": "00:00:20",
+            "Text": "[laughter] It appears to be a combination of factors, including greater awareness of sustainability issues and a growing demand for personalized experiences.",
+            "Emotion": "Laughing",
+            "PrimaryEmotion": "Joy",
+            "Language": "en-US"
+        }
+    ],
+    "Summary": "Two individuals discuss the shifting landscape of consumer preferences, identifying sustainability and personalized experiences as the primary drivers of this change."
+}
