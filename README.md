@@ -66,6 +66,16 @@ python main.py --file path/to/audio.wav --speakers 2 --model gemini-3-flash-prev
 | `--model` | Gemini model version to use | `gemini-3-flash-preview` |
 | `--api-key` | Google API Key (can also set via `GOOGLE_API_KEY` env var) | - |
 
+## Utility Scripts
+
+### List Available Models
+
+You can list all Gemini models available to your API key by running:
+
+```bash
+python scripts/list_models.py
+```
+
 ## Output
 
 The tool creates an `out` directory containing a folder named after the audio file for each run. Existing files in the folder are overwritten on subsequent runs.
