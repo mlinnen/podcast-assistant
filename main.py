@@ -7,6 +7,7 @@ from scripts import file_ops
 from scripts import extract_text
 from scripts import marketing_generator
 from scripts import transcript_exporter
+from scripts import topic_analyzer
 
 # Load environment variables (for API Key if in .env)
 load_dotenv()
@@ -48,8 +49,14 @@ def main():
             **metadata,
             **transcription_result
         }
+
+        # 4. Identify Topics
+        print("Identifying topics...")
+        if "Dialog" in final_output:
+            topics = topic_analyzer.identify_topics(final_output["Dialog"], api_key, args.model)
+            final_output["Topics"] = topics
         
-        # 4. Extract Text and Generate Marketing Content
+        # 5. Extract Text and Generate Marketing Content
         print("Generating marketing content...")
         dialogue_text = extract_text.extract_dialogue_from_data(final_output)
         if dialogue_text:
@@ -59,7 +66,7 @@ def main():
         # Create output directory once for all subsequent file operations
         output_dir = file_ops.create_output_directory(audio_path)
 
-        # 5. Export Transcript Review Document
+        # 6. Export Transcript Review Document
         print("Exporting review document...")
         review_file = transcript_exporter.export_review_document(final_output, output_dir)
         
@@ -69,7 +76,7 @@ def main():
             "TranscriptFile": review_file
         }
         
-        # 6. Save Results
+        # 7. Save Results
         json_path = file_ops.save_results(output_dir, audio_path, final_output)
         
         print(f"Success! Results saved to {output_dir}")

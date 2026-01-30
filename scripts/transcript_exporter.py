@@ -12,6 +12,13 @@ def export_review_document(transcription_data, output_dir):
     lines = []
     lines.append(f"# Transcript Review: {transcription_data.get('FileName', 'Unknown')}")
     lines.append(f"Length: {transcription_data.get('LengthOfAudio', 'Unknown')}")
+    
+    topics = transcription_data.get("Topics", [])
+    if topics:
+        lines.append("\n## Topics\n")
+        for topic in topics:
+            lines.append(f"- **{topic.get('Start')}**: {topic.get('Text')}")
+
     lines.append("\n## Transcript\n")
     
     for entry in transcription_data.get("Dialog", []):
@@ -26,16 +33,16 @@ def export_review_document(transcription_data, output_dir):
         
         youtube = publications.get("YouTube", {})
         if youtube:
-            description = youtube.get('Description', 'N/A').replace('\\n', '\n')
+            description = youtube.get('Description', 'N/A')
             lines.append("### YouTube")
-            lines.append(f"**Title**: {youtube.get('Title', 'N/A')}")
-            lines.append(f"**Description**:\n{description}\n")
+            lines.append(f"**Title**:\n\n{youtube.get('Title', 'N/A')}\n\n")
+            lines.append(f"**Description**:\n\n{description}\n")
             
         facebook = publications.get("Facebook", {})
         if facebook:
             post = facebook.get('Post', 'N/A').replace('\\n', '\n')
             lines.append("### Facebook")
-            lines.append(f"**Post**:\n{post}\n")
+            lines.append(f"**Post**:\n\n{post}\n")
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
