@@ -8,6 +8,7 @@ from scripts import extract_text
 from scripts import marketing_generator
 from scripts import transcript_exporter
 from scripts import topic_analyzer
+from scripts import video_creator
 
 # Load environment variables (for API Key if in .env)
 load_dotenv()
@@ -18,6 +19,7 @@ def main():
     parser.add_argument("--speakers", type=int, default=2, help="Expected number of speakers")
     parser.add_argument("--api-key", help="Google API Key (optional if GOOGLE_API_KEY env var is set)")
     parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model to use")
+    parser.add_argument("--video", help="Path to an image file to create a video from the audio")
     
     args = parser.parse_args()
     
@@ -76,7 +78,18 @@ def main():
             "TranscriptFile": review_file
         }
         
-        # 7. Save Results
+        # 7. Create Video (if requested)
+        if args.video:
+            print("Creating video...")
+            video_path = video_creator.create_video(audio_path, args.video, output_dir)
+            if video_path:
+                if "Publications" not in final_output:
+                    final_output["Publications"] = {}
+                final_output["Publications"]["Video"] = {
+                    "VideoFile": os.path.basename(video_path)
+                }
+
+        # 8. Save Results
         json_path = file_ops.save_results(output_dir, audio_path, final_output)
         
         print(f"Success! Results saved to {output_dir}")

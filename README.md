@@ -12,12 +12,14 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
 - **Language Detection**: Identifies the spoken language (e.g., `en-US`).
 - **Summarization**: Generates a concise summary of the entire conversation.
 - **Marketing Content**: Generates optimized YouTube titles, descriptions (with line breaks), and Facebook posts.
+- **Video Creation**: Creates an MP4 video by looping an image over the audio.
 - **Transcript Review**: Exports a formatted Markdown document (`_review.md`) for easy proofreading.
 - **Metadata**: Extracts file metadata (size, dates, duration).
 
 ## Prerequisites
 
 - **Python 3.8+**
+- **FFMpeg**: Required for video creation. Must be installed and available in your system PATH.
 - **Google API Key**: Get one from [Google AI Studio](https://aistudio.google.com/).
 
 ## Installation
@@ -57,6 +59,12 @@ Specify the expected number of speakers and a specific Gemini model:
 python main.py --file path/to/audio.wav --speakers 2 --model gemini-3-flash-preview
 ```
 
+Create a video file from the audio and an image:
+
+```bash
+python main.py --file path/to/audio.wav --video path/to/image.png
+```
+
 ### Arguments
 
 | Argument | Description | Default |
@@ -64,6 +72,7 @@ python main.py --file path/to/audio.wav --speakers 2 --model gemini-3-flash-prev
 | `--file` | Path to the audio file (Required) | - |
 | `--speakers` | Expected number of speakers | `2` |
 | `--model` | Gemini model version to use | `gemini-3-flash-preview` |
+| `--video` | Path to an image file to create a video from the audio | - |
 | `--api-key` | Google API Key (can also set via `GOOGLE_API_KEY` env var) | - |
 
 ## Utility Scripts
@@ -86,7 +95,10 @@ out/
   sample_audio/
     sample_audio.wav       # Copy of the original file
     sample_audio.json      # Full transcription results and marketing content
+    sample_audio.wav       # Copy of the original file
+    sample_audio.json      # Full transcription results and marketing content
     sample_audio_review.md # Formatted review document
+    sample_audio.mp4       # Generated video (if --video is used)
 ```
 
 **JSON Output Example:**
@@ -107,6 +119,12 @@ out/
     },
     "Review": {
       "TranscriptFile": "sample_review.md"
+    }
+    "Review": {
+      "TranscriptFile": "sample_review.md"
+    },
+    "Video": {
+      "VideoFile": "sample.mp4"
     }
   }
 }
