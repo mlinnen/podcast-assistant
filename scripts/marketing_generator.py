@@ -28,8 +28,8 @@ def generate_marketing_content(text, api_key, model_name="gemini-3-flash-preview
     YOUTUBE REQUIREMENTS:
     - YouTubeTitle: Catchy, attention-grabbing, and optimized for search.
     - YouTubeDescription: A brief, compelling summary.
+    - IMPORTANT: Use literal '\n' characters to create line breaks and separate sections (e.g., Summary, URLs, Hashtags).
     - URLs: Any URLs mentioned in the text MUST be extracted and listed at the end of the description as a bulleted list.
-    - Formatting: Use YouTube-friendly formatting (line breaks, clear sections).
     - Hashtags: 3-5 relevant hashtags after the URLs list.
     
     FACEBOOK REQUIREMENTS:
