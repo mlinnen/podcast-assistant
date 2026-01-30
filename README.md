@@ -11,6 +11,8 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
   - **Primary**: Identifies the dominant emotion of each segment.
 - **Language Detection**: Identifies the spoken language (e.g., `en-US`).
 - **Summarization**: Generates a concise summary of the entire conversation.
+- **Marketing Content**: Generates optimized YouTube titles, descriptions (with line breaks), and Facebook posts.
+- **Transcript Review**: Exports a formatted Markdown document (`_review.md`) for easy proofreading.
 - **Metadata**: Extracts file metadata (size, dates, duration).
 
 ## Prerequisites
@@ -60,14 +62,15 @@ python main.py --file path/to/audio.wav --speakers 2 --model gemini-3-flash-prev
 
 ## Output
 
-The tool creates an `out` directory containing timestamped folders for each run.
+The tool creates an `out` directory containing a folder named after the audio file for each run. Existing files in the folder are overwritten on subsequent runs.
 
 **Structure:**
 ```
 out/
-  20240129_170000/
-    sample_audio.wav  # Copy of the original file
-    sample_audio.json # Full transcription results
+  sample_audio/
+    sample_audio.wav       # Copy of the original file
+    sample_audio.json      # Full transcription results and marketing content
+    sample_audio_review.md # Formatted review document
 ```
 
 **JSON Output Example:**
@@ -76,18 +79,20 @@ out/
   "FileName": "sample.wav",
   "LengthOfAudio": "00:05:30",
   "Speakers": ["Speaker 1", "Speaker 2"],
-  "Dialog": [
-    {
-      "Speaker": "Speaker 1",
-      "Start": "00:00:00",
-      "Stop": "00:00:10",
-      "Text": "Welcome to the podcast! [excited]",
-      "Emotion": "Excited",
-      "PrimaryEmotion": "Joy",
-      "Language": "en-US"
+  "Dialog": [...],
+  "Summary": "Hosts discuss the new podcast format...",
+  "Publications": {
+    "YouTube": {
+      "Title": "Catchy Title",
+      "Description": "Compelling summary\n\nURLs:\n- example.com"
+    },
+    "Facebook": {
+      "Post": "Check out our latest episode!"
+    },
+    "Review": {
+      "TranscriptFile": "sample_review.md"
     }
-  ],
-  "Summary": "Hosts discuss the new podcast format..."
+  }
 }
 ```
 
