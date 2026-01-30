@@ -4,6 +4,8 @@ import sys
 from dotenv import load_dotenv
 from scripts import transcriber
 from scripts import file_ops
+from scripts import extract_text
+from scripts import marketing_generator
 
 # Load environment variables (for API Key if in .env)
 load_dotenv()
@@ -46,7 +48,16 @@ def main():
             **transcription_result
         }
         
-        # 4. Save Results
+        # 4. Extract Text and Generate Marketing Content
+        print("Generating marketing content...")
+        dialogue_text = extract_text.extract_dialogue_from_data(final_output)
+        if dialogue_text:
+            marketing_content = marketing_generator.generate_marketing_content(dialogue_text, api_key, args.model)
+            final_output["Publications"] = {
+                "YouTube": marketing_content
+            }
+        
+        # 5. Save Results
         output_dir = file_ops.create_output_directory()
         json_path = file_ops.save_results(output_dir, audio_path, final_output)
         

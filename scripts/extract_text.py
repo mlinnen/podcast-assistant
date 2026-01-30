@@ -2,6 +2,16 @@ import json
 import argparse
 import sys
 
+def extract_dialogue_from_data(data):
+    """
+    Extracts all dialogue text from a transcription data dictionary.
+    """
+    if 'Dialog' not in data:
+        return None
+    
+    dialogue_segments = [segment.get('Text', '') for segment in data['Dialog']]
+    return " ".join(dialogue_segments)
+
 def extract_dialogue_text(json_file_path):
     """
     Reads a transcription JSON file and returns all dialogue text as a single string.
@@ -9,13 +19,7 @@ def extract_dialogue_text(json_file_path):
     try:
         with open(json_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        
-        if 'Dialog' not in data:
-            print(f"Error: 'Dialog' key not found in {json_file_path}", file=sys.stderr)
-            return None
-        
-        dialogue_segments = [segment.get('Text', '') for segment in data['Dialog']]
-        return " ".join(dialogue_segments)
+        return extract_dialogue_from_data(data)
     
     except FileNotFoundError:
         print(f"Error: File not found at {json_file_path}", file=sys.stderr)
