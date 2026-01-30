@@ -1,6 +1,6 @@
-# Audio Transcriber CLI
+# Podcast Assistant: Audio Transcriber CLI
 
-A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe audio files. It features speaker diarization, emotion detection, language identification, and conversation summarization.
+A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe audio files. It features speaker diarization, emotion detection, language identification, and conversation marketing publication.
 
 ## Features
 
@@ -24,13 +24,19 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/podcast-assistant.git
+   git clone https://github.com/mlinnen/podcast-assistant.git
    cd podcast-assistant
    ```
 
 2. Install dependencies:
    ```bash
    pip install -r requirements.txt
+   ```
+
+3. Configure environment:
+   Create a `.env` file in the root directory and add your Google API key:
+   ```
+   GOOGLE_API_KEY=your_api_key_here
    ```
 
 ## Usage
@@ -98,4 +104,4 @@ out/
 
 ## License
 
-[MIT](LICENSE)
+MIT
