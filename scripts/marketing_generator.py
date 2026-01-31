@@ -40,9 +40,10 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     
     FACEBOOK REQUIREMENTS:
     - Post: A compelling post for Facebook.
-    - IMPORTANT: Do NOT include any URLs in the Facebook post.
+    - IMPORTANT: Do NOT include any actual URLs extracted from the text in the Facebook post.
     - Focus on engagement and storytelling.
     - Include 2-3 relevant hashtags at the end.
+    - AFTER the hashtags, on a new line, add the placeholder text "[INSERT YOUTUBE URL HERE]".
     
     {topics_context}
     
