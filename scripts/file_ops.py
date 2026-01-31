@@ -29,8 +29,10 @@ def create_output_directory(audio_file_path, base_out_dir="out"):
 
 def save_results(output_dir, audio_file_path, data):
     """Saves the JSON result and copies the audio file to the output directory."""
-    # Copy audio file
-    shutil.copy2(audio_file_path, output_dir)
+    # Copy audio file only if it's not already in the output directory
+    dest_path = os.path.join(output_dir, os.path.basename(audio_file_path))
+    if os.path.abspath(audio_file_path) != os.path.abspath(dest_path):
+        shutil.copy2(audio_file_path, output_dir)
     
     # Save JSON
     json_filename = os.path.splitext(os.path.basename(audio_file_path))[0] + ".json"

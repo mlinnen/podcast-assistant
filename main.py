@@ -62,7 +62,12 @@ def main():
         print("Generating marketing content...")
         dialogue_text = extract_text.extract_dialogue_from_data(final_output)
         if dialogue_text:
-            marketing_content = marketing_generator.generate_marketing_content(dialogue_text, api_key, args.model)
+            marketing_content = marketing_generator.generate_marketing_content(
+                dialogue_text, 
+                api_key, 
+                topics=final_output.get("Topics"),
+                model_name=args.model
+            )
             final_output["Publications"] = marketing_content
         
         # Create output directory once for all subsequent file operations
