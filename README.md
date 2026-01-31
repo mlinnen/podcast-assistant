@@ -95,8 +95,6 @@ out/
   sample_audio/
     sample_audio.wav       # Copy of the original file
     sample_audio.json      # Full transcription results and marketing content
-    sample_audio.wav       # Copy of the original file
-    sample_audio.json      # Full transcription results and marketing content
     sample_audio_review.md # Formatted review document
     sample_audio.mp4       # Generated video (if --video is used)
 ```
@@ -117,9 +115,6 @@ out/
     "Facebook": {
       "Post": "Check out our latest episode!"
     },
-    "Review": {
-      "TranscriptFile": "sample_review.md"
-    }
     "Review": {
       "TranscriptFile": "sample_review.md"
     },

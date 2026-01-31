@@ -4,7 +4,7 @@
     "DateCreated": "2026-01-29T16:31:33.668430",
     "DateModified": "2026-01-29T15:52:08.827707",
     "FileSize": 956730,
-    "LengthOfAudio": "00:00:19",
+    "LengthOfAudio": "00:00:20",
     "Speakers": [
         "Speaker 1",
         "Speaker 2"
@@ -15,7 +15,7 @@
             "Start": "00:00:00",
             "Stop": "00:00:07",
             "Text": "We're seeing a noticeable shift in consumer preferences across several sectors. What seems to be driving this change?",
-            "Emotion": "Serious",
+            "Emotion": "Inquisitive",
             "PrimaryEmotion": "Neutral",
             "Language": "en-US"
         },
@@ -29,27 +29,26 @@
             "Language": "en-US"
         }
     ],
-    "Summary": "Two speakers discuss the reasons behind changing consumer preferences, citing sustainability and personalization as key factors.",
+    "Summary": "Two speakers discuss the reasons behind shifting consumer preferences, specifically citing sustainability concerns and the need for personalization.",
     "Topics": [
         {
             "Start": "00:00:00",
-            "Text": "Discussion on shifting consumer preferences across various sectors"
-        },
-        {
-            "Start": "00:00:07",
-            "Text": "Sustainability and personalization as key drivers of change in consumer behavior"
+            "Text": "Discussion on shifting consumer preferences and the underlying drivers such as sustainability and personalization."
         }
     ],
     "Publications": {
         "YouTube": {
-            "Title": "Why Consumer Preferences are Shifting: Sustainability & Personalization Explained",
-            "Description": "Discover the driving forces behind the latest shifts in consumer behavior. We explore how sustainability awareness and the demand for personalized experiences are reshaping the industry.\n\nSummary\nThis video breaks down the core reasons behind modern market shifts, highlighting the critical role of eco-consciousness and tailored customer journeys.\n\nURLs\n- No URLs mentioned in transcript\n\n#ConsumerTrends #Sustainability #Marketing2024 #Personalization #BusinessGrowth"
+            "Title": "Why Consumer Behavior is Shifting: The Power of Sustainability and Personalization",
+            "Description": "In this video, we dive into the significant changes occurring in consumer preferences across various sectors and what it means for the future of business.\n\nSummary:\nWe explore the dual drivers of modern market shifts: a heightened awareness of sustainability and the increasing demand for tailored, personalized experiences. Learn why these factors are becoming non-negotiable for today's consumers.\n\nURLs:\n- No URLs mentioned in the transcript.\n\n#ConsumerTrends #Sustainability #Personalization #MarketingStrategy #BusinessGrowth"
         },
         "Facebook": {
-            "Post": "Consumer habits are evolving faster than ever! 🌍✨ We are seeing a massive shift toward sustainability and personalized experiences. It is no longer just about the product; it is about the values behind the brand and the way they make us feel as individuals. This shift is redefining how successful brands connect with their communities. What is one brand you stick with because of their mission? Let us know below! #ConsumerBehavior #Sustainability #MarketTrends"
+            "Post": "Have you noticed a change in how you choose the brands you support? We are witnessing a massive evolution in consumer behavior! It is no longer just about the product—it is about the impact on our planet and the personal connection we feel with a brand. From eco-conscious decisions to the desire for a bespoke experience, the market is transforming right before our eyes. How much do sustainability and personalization influence your buying decisions? Let's discuss below! #ConsumerBehavior #SustainableLiving #PersonalizedExperience"
         },
         "Review": {
             "TranscriptFile": "sample3_review.md"
+        },
+        "Video": {
+            "VideoFile": "sample3.mp4"
         }
     }
 }
