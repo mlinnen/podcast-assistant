@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import json
 from dotenv import load_dotenv
 from scripts import transcriber
 from scripts import file_ops
@@ -39,36 +40,61 @@ def main():
     print(f"Speakers: {args.speakers}")
     
     try:
+        # Determine output paths
+        output_dir, json_path = file_ops.get_output_paths(audio_path)
+        
+        # Initialize final_output
+        final_output = {}
+        if os.path.exists(json_path):
+            print(f"Found existing JSON at {json_path}. Checking for completed parts...")
+            try:
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    final_output = json.load(f)
+            except Exception as e:
+                print(f"Warning: Could not load existing JSON ({e}). Starting fresh.")
+                final_output = {}
+
         # 1. Get File Metadata
-        metadata = file_ops.get_file_metadata(audio_path)
+        if not all(k in final_output for k in ["FileName", "FileSize", "DateCreated"]):
+            metadata = file_ops.get_file_metadata(audio_path)
+            final_output.update(metadata)
         
         # 2. Transcribe
-        print("Transcribing audio...")
-        transcription_result = transcriber.transcribe_audio(audio_path, api_key, args.speakers, args.model)
-        
-        # 3. Combine Data
-        final_output = {
-            **metadata,
-            **transcription_result
-        }
+        if "Dialog" not in final_output:
+            print("Transcribing audio...")
+            transcription_result = transcriber.transcribe_audio(audio_path, api_key, args.speakers, args.model)
+            final_output.update(transcription_result)
+        else:
+            print("Skipping transcription (already exists).")
 
         # 4. Identify Topics
-        print("Identifying topics...")
-        if "Dialog" in final_output:
-            topics = topic_analyzer.identify_topics(final_output["Dialog"], api_key, args.model)
-            final_output["Topics"] = topics
+        if "Topics" not in final_output:
+            print("Identifying topics...")
+            if "Dialog" in final_output:
+                topics = topic_analyzer.identify_topics(final_output["Dialog"], api_key, args.model)
+                final_output["Topics"] = topics
+        else:
+            print("Skipping topic analysis (already exists).")
         
         # 5. Extract Text and Generate Marketing Content
-        print("Generating marketing content...")
-        dialogue_text = extract_text.extract_dialogue_from_data(final_output)
-        if dialogue_text:
-            marketing_content = marketing_generator.generate_marketing_content(
-                dialogue_text, 
-                api_key, 
-                topics=final_output.get("Topics"),
-                model_name=args.model
-            )
-            final_output["Publications"] = marketing_content
+        marketing_keys = ["Facebook", "YouTube"]
+        has_marketing = "Publications" in final_output and all(k in final_output["Publications"] for k in marketing_keys)
+        
+        if not has_marketing:
+            print("Generating marketing content...")
+            dialogue_text = extract_text.extract_dialogue_from_data(final_output)
+            if dialogue_text:
+                marketing_content = marketing_generator.generate_marketing_content(
+                    dialogue_text, 
+                    api_key, 
+                    topics=final_output.get("Topics"),
+                    model_name=args.model
+                )
+                if "Publications" not in final_output:
+                    final_output["Publications"] = {}
+                final_output["Publications"].update(marketing_content)
+        else:
+            print("Skipping marketing content generation (already exists).")
         
         # Create output directory once for all subsequent file operations
         output_dir = file_ops.create_output_directory(audio_path)
@@ -85,14 +111,24 @@ def main():
         
         # 7. Create Video (if requested)
         if args.video:
-            print("Creating video...")
-            video_path = video_creator.create_video(audio_path, args.video, output_dir)
-            if video_path:
-                if "Publications" not in final_output:
-                    final_output["Publications"] = {}
-                final_output["Publications"]["Video"] = {
-                    "VideoFile": os.path.basename(video_path)
-                }
+            # Check if video already exists in Publications
+            video_exists = False
+            if "Publications" in final_output and "Video" in final_output["Publications"]:
+                video_filename = final_output["Publications"]["Video"].get("VideoFile")
+                if video_filename and os.path.exists(os.path.join(output_dir, video_filename)):
+                    video_exists = True
+            
+            if not video_exists:
+                print("Creating video...")
+                video_path = video_creator.create_video(audio_path, args.video, output_dir)
+                if video_path:
+                    if "Publications" not in final_output:
+                        final_output["Publications"] = {}
+                    final_output["Publications"]["Video"] = {
+                        "VideoFile": os.path.basename(video_path)
+                    }
+            else:
+                print("Skipping video creation (already exists).")
 
         # 8. Save Results
         json_path = file_ops.save_results(output_dir, audio_path, final_output)
