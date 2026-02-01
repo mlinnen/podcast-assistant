@@ -11,7 +11,17 @@ def export_review_document(transcription_data, output_dir):
     
     lines = []
     lines.append(f"# Transcript Review: {transcription_data.get('FileName', 'Unknown')}")
-    lines.append(f"Length: {transcription_data.get('LengthOfAudio', 'Unknown')}")
+    lines.append(f"**Length**: {transcription_data.get('LengthOfAudio', 'Unknown')}")
+    
+    # Add Video Link/Info at the beginning
+    video_info = transcription_data.get("Publications", {}).get("Video", {})
+    if video_info:
+        youtube_id = video_info.get("YouTubeVideoID")
+        video_file = video_info.get("VideoFile")
+        if youtube_id:
+            lines.append(f"**YouTube**: [https://youtu.be/{youtube_id}](https://youtu.be/{youtube_id})")
+        elif video_file:
+            lines.append(f"**Video File**: `{video_file}`")
     
     topics = transcription_data.get("Topics", [])
     if topics:
