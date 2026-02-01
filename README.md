@@ -12,6 +12,7 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
 - **Language Detection**: Identifies the spoken language (e.g., `en-US`).
 - **Summarization**: Generates a concise summary of the entire conversation.
 - **Marketing Content**: Generates optimized YouTube titles, descriptions (with line breaks), and Facebook posts.
+- **YouTube Publishing**: Automatically publish generated videos to YouTube with SEO-optimized metadata.
 - **Video Creation**: Creates an MP4 video by looping an image over the audio.
 - **Transcript Review**: Exports a formatted Markdown document (`_review.md`) for easy proofreading.
 - **Metadata**: Extracts file metadata (size, dates, duration).
@@ -20,7 +21,8 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
 
 - **Python 3.8+**
 - **FFMpeg**: Required for video creation. Must be installed and available in your system PATH.
-- **Google API Key**: Get one from [Google AI Studio](https://aistudio.google.com/).
+- **Google API Key**: Get one from [Google AI Studio](https://aistudio.google.com/) for Gemini access.
+- **YouTube Data API v3**: Enable this in the [Google Cloud Console](https://console.cloud.google.com/) and download `client_secrets.json` to the project root for publishing.
 
 ## Installation
 
@@ -40,6 +42,13 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
    ```
    GOOGLE_API_KEY=your_api_key_here
    ```
+
+4. **YouTube Publishing Setup (Optional)**:
+   - Create a project in the [Google Cloud Console](https://console.cloud.google.com/).
+   - Enable **YouTube Data API v3**.
+   - Create **OAuth 2.0 Client IDs** (Desktop app).
+   - Download the `client_secrets.json` file and place it in the project root.
+   - Use `client_secrets.json.example` as a template if needed.
 
 ## Usage
 
@@ -65,6 +74,12 @@ Create a video file from the audio and an image:
 python main.py --file path/to/audio.wav --video path/to/image.png
 ```
 
+Transcribe, create a video, and publish to YouTube:
+
+```bash
+python main.py --file path/to/audio.wav --video path/to/image.png --publish
+```
+
 ### Arguments
 
 | Argument | Description | Default |
@@ -73,6 +88,7 @@ python main.py --file path/to/audio.wav --video path/to/image.png
 | `--speakers` | Expected number of speakers | `2` |
 | `--model` | Gemini model version to use | `gemini-3-flash-preview` |
 | `--video` | Path to an image file to create a video from the audio | - |
+| `--publish` | Publish the generated video to YouTube (requires setup) | `False` |
 | `--api-key` | Google API Key (can also set via `GOOGLE_API_KEY` env var) | - |
 
 ## Utility Scripts
@@ -119,7 +135,8 @@ out/
       "TranscriptFile": "sample_review.md"
     },
     "Video": {
-      "VideoFile": "sample.mp4"
+      "VideoFile": "sample.mp4",
+      "YouTubeVideoID": "dQw4w9WgXcQ"
     }
   }
 }

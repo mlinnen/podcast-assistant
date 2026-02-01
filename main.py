@@ -10,6 +10,7 @@ from scripts import marketing_generator
 from scripts import transcript_exporter
 from scripts import topic_analyzer
 from scripts import video_creator
+from scripts import youtube_publisher
 
 # Load environment variables (for API Key if in .env)
 load_dotenv()
@@ -21,6 +22,7 @@ def main():
     parser.add_argument("--api-key", help="Google API Key (optional if GOOGLE_API_KEY env var is set)")
     parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model to use")
     parser.add_argument("--video", help="Path to an image file to create a video from the audio")
+    parser.add_argument("--publish", action="store_true", help="Publish the generated video to YouTube")
     
     args = parser.parse_args()
     
@@ -130,7 +132,33 @@ def main():
             else:
                 print("Skipping video creation (already exists).")
 
-        # 8. Save Results
+        # 8. Publish to YouTube (if requested)
+        if args.publish:
+            video_info = final_output.get("Publications", {}).get("Video")
+            if video_info and "VideoFile" in video_info:
+                video_filename = video_info["VideoFile"]
+                video_path = os.path.join(output_dir, video_filename)
+                
+                if os.path.exists(video_path):
+                    # Check if already published
+                    if "YouTubeVideoID" not in video_info:
+                        print("Publishing to YouTube...")
+                        
+                        youtube_data = final_output.get("Publications", {}).get("YouTube", {})
+                        title = youtube_data.get("Title", "Podcast Episode")
+                        description = youtube_data.get("Description", "").replace("\\n", "\n")
+                        
+                        video_id = youtube_publisher.publish_video(video_path, title, description)
+                        if video_id:
+                            video_info["YouTubeVideoID"] = video_id
+                    else:
+                        print(f"Skipping publication (already published with ID: {video_info['YouTubeVideoID']}).")
+                else:
+                    print(f"Warning: Video file not found at {video_path}. Cannot publish.")
+            else:
+                print("Warning: No video metadata found. Did you use --video?")
+
+        # 9. Save Results
         json_path = file_ops.save_results(output_dir, audio_path, final_output)
         
         print(f"Success! Results saved to {output_dir}")
