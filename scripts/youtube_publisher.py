@@ -32,10 +32,11 @@ def get_authenticated_service():
 
     return build('youtube', 'v3', credentials=creds)
 
-def publish_video(video_path, title, description, category_id="26", privacy_status="private"):
+def publish_video(video_path, title, description, category_id="26", privacy_status="unlisted"):
     """
     Uploads a video to YouTube.
     Default category is 26 (How-to & Style).
+    Default privacy is unlisted.
     """
     if not os.path.exists(video_path):
         print(f"Error: Video file not found at {video_path}")
