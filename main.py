@@ -151,6 +151,17 @@ def main():
                         video_id = youtube_publisher.publish_video(video_path, title, description)
                         if video_id:
                             video_info["YouTubeVideoID"] = video_id
+                            
+                            # Update Facebook post with the new YouTube URL
+                            facebook_info = final_output.get("Publications", {}).get("Facebook")
+                            if facebook_info and "Post" in facebook_info:
+                                youtube_url = f"https://youtu.be/{video_id}"
+                                facebook_info["Post"] = facebook_info["Post"].replace("[INSERT YOUTUBE URL HERE]", youtube_url)
+                                print(f"Updated Facebook post with URL: {youtube_url}")
+                            
+                            # Re-export the review document to reflect the updated Facebook post
+                            print("Updating review document...")
+                            transcript_exporter.export_review_document(final_output, output_dir)
                     else:
                         print(f"Skipping publication (already published with ID: {video_info['YouTubeVideoID']}).")
                 else:
