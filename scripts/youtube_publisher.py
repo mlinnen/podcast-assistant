@@ -6,7 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 
 def get_authenticated_service():
     creds = None
@@ -71,3 +71,30 @@ def publish_video(video_path, title, description, category_id="26", privacy_stat
 
     print(f"Video id '{response['id']}' was successfully uploaded.")
     return response['id']
+
+def video_exists(youtube, video_id):
+    """
+    Checks if a video exists on YouTube by its ID.
+    """
+    try:
+        request = youtube.videos().list(
+            part="id",
+            id=video_id
+        )
+        response = request.execute()
+        return len(response.get('items', [])) > 0
+    except Exception:
+        return False
+
+def delete_video(youtube, video_id):
+    """
+    Deletes a video from YouTube by its ID.
+    """
+    try:
+        print(f"Deleting video with ID: {video_id}...")
+        youtube.videos().delete(id=video_id).execute()
+        print("Video successfully deleted.")
+        return True
+    except Exception as e:
+        print(f"Error deleting video: {e}")
+        return False

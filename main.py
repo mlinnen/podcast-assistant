@@ -141,7 +141,28 @@ def main():
                 
                 if os.path.exists(video_path):
                     # Check if already published
-                    if "YouTubeVideoID" not in video_info:
+                    youtube_video_id = video_info.get("YouTubeVideoID")
+                    
+                    proceed_to_publish = True
+                    if youtube_video_id:
+                        youtube = youtube_publisher.get_authenticated_service()
+                        if youtube_publisher.video_exists(youtube, youtube_video_id):
+                            confirm = input(f"Video ID '{youtube_video_id}' already exists on YouTube. Overwrite? (y/n): ").lower()
+                            if confirm == 'y':
+                                if youtube_publisher.delete_video(youtube, youtube_video_id):
+                                    # Temporarily remove ID so it triggers a fresh upload below
+                                    video_info.pop("YouTubeVideoID", None)
+                                else:
+                                    print("Failed to delete existing video. Aborting publish.")
+                                    proceed_to_publish = False
+                            else:
+                                print(f"Skipping publication (user chose not to overwrite).")
+                                proceed_to_publish = False
+                        else:
+                            print(f"Video with ID {youtube_video_id} not found on YouTube. Proceeding with fresh upload.")
+                            video_info.pop("YouTubeVideoID", None)
+
+                    if proceed_to_publish:
                         print("Publishing to YouTube...")
                         
                         youtube_data = final_output.get("Publications", {}).get("YouTube", {})
@@ -162,8 +183,6 @@ def main():
                             # Re-export the review document to reflect the updated Facebook post
                             print("Updating review document...")
                             transcript_exporter.export_review_document(final_output, output_dir)
-                    else:
-                        print(f"Skipping publication (already published with ID: {video_info['YouTubeVideoID']}).")
                 else:
                     print(f"Warning: Video file not found at {video_path}. Cannot publish.")
             else:
