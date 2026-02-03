@@ -24,19 +24,6 @@ def export_review_document(transcription_data, output_dir):
         elif video_file:
             lines.append(f"**Video File**: `{video_file}`")
     
-    topics = transcription_data.get("Topics", [])
-    if topics:
-        lines.append("\n## Topics\n")
-        for topic in topics:
-            lines.append(f"- **{topic.get('Start')}**: {topic.get('Text')}")
-
-    lines.append("\n## Transcript\n")
-    
-    for entry in transcription_data.get("Dialog", []):
-        speaker = entry.get("Speaker", "Unknown")
-        text = entry.get("Text", "")
-        lines.append(f"**{speaker}**: {text}\n")
-    
     publications = transcription_data.get("Publications", {})
     if publications:
         lines.append("\n---\n")
@@ -54,6 +41,14 @@ def export_review_document(transcription_data, output_dir):
             post = facebook.get('Post', 'N/A').replace('\\n', '\n')
             lines.append("### Facebook")
             lines.append(f"**Post**:\n\n{post}\n")
+
+    lines.append("\n---\n")
+    lines.append("## Transcript\n")
+    
+    for entry in transcription_data.get("Dialog", []):
+        speaker = entry.get("Speaker", "Unknown")
+        text = entry.get("Text", "")
+        lines.append(f"**{speaker}**: {text}\n")
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
