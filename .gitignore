@@ -22,3 +22,6 @@ token.pickle
 # IDEs
 .vscode/
 .idea/
+
+# Tests
+test_output/
