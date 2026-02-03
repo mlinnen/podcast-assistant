@@ -167,7 +167,7 @@ def main():
                         
                         youtube_data = final_output.get("Publications", {}).get("YouTube", {})
                         title = youtube_data.get("Title", "Podcast Episode")
-                        description = youtube_data.get("Description", "").replace("\\n", "\n")
+                        description = youtube_data.get("Description", "")
                         
                         video_id = youtube_publisher.publish_video(video_path, title, description)
                         if video_id:

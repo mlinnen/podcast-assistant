@@ -39,8 +39,8 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     - YouTubeTitle: Catchy, attention-grabbing, and optimized for search.
     - YouTubeDescription: A brief, compelling summary.
     - IMPORTANT: Use literal '\n' characters to create line breaks and separate sections (e.g., Summary, Topics, URLs, Hashtags).
-    - Topics: A section titled "Topics:" followed by a bulleted list of topics with their "Start" timestamps from the provided topics below. This should come BEFORE the URLs.
-    - URLs: Any URLs mentioned in the text MUST be extracted and listed at the end of the description as a bulleted list.
+    - Topics: A section titled "Topics:" followed by a list of topics using a hyphen '-' as the bullet point for each item, with their "Start" timestamps from the provided topics below. This should come BEFORE the URLs.
+    - URLs: Any URLs mentioned in the text MUST be extracted and listed at the end of the description as a list using a hyphen '-' as the bullet point for each item.
     - Hashtags: 3-5 relevant hashtags after the URLs list.
     
     FACEBOOK REQUIREMENTS:
@@ -55,7 +55,7 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     SPOTIFY REQUIREMENTS:
     - Title: A professional podcast episode title.
     - Description: A detailed and professional show notes summary.
-    - Include topics and any relevant links.
+    - Include topics (using a hyphen '-' as the bullet point for each item) and any relevant links.
     - IMPORTANT: Use literal '\n' characters to create line breaks.
     
     {topics_context}
