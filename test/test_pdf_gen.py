@@ -22,6 +22,10 @@ def test_pdf_generation():
             },
             "Facebook": {
                 "Post": "This is a test post."
+            },
+            "Spotify": {
+                "Title": "Spotify Test Title",
+                "Description": "Spotify test description."
             }
         }
     }

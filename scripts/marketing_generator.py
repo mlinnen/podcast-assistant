@@ -10,9 +10,14 @@ class YouTubeMarketing(typing.TypedDict):
 class FacebookMarketing(typing.TypedDict):
     Post: str
 
+class SpotifyMarketing(typing.TypedDict):
+    Title: str
+    Description: str
+
 class MarketingContent(typing.TypedDict):
     YouTube: YouTubeMarketing
     Facebook: FacebookMarketing
+    Spotify: SpotifyMarketing
 
 def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-flash-preview"):
     """
@@ -47,6 +52,12 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     - Include 2-3 relevant hashtags at the end.
     - AFTER the hashtags, on a new line, add the placeholder text "[INSERT YOUTUBE URL HERE]".
     
+    SPOTIFY REQUIREMENTS:
+    - Title: A professional podcast episode title.
+    - Description: A detailed and professional show notes summary.
+    - Include topics and any relevant links.
+    - IMPORTANT: Use literal '\n' characters to create line breaks.
+    
     {topics_context}
     
     TRANSCRIPT TEXT:
@@ -60,6 +71,10 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
         }},
         "Facebook": {{
             "Post": "..."
+        }},
+        "Spotify": {{
+            "Title": "...",
+            "Description": "..."
         }}
     }}
     """

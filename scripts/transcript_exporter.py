@@ -40,14 +40,22 @@ def export_review_document(transcription_data, output_dir):
             lines.append("### YouTube")
             lines.append("This is what will be posted on YouTube\n\n")
             lines.append(f"**Title**:\n\n{youtube.get('Title', 'N/A')}\n\n")
-            lines.append(f"**Description**:\n\n{description}")
+            lines.append(f"**Description**:\n\n{description}\n\n")
             
         facebook = publications.get("Facebook", {})
         if facebook:
             post = facebook.get('Post', 'N/A')
             lines.append("### Facebook")
             lines.append("This is what will be posted on Facebook\n\n")
-            lines.append(f"**Description**:\n\n{post}")
+            lines.append(f"**Description**:\n\n{post}\n\n")
+
+        spotify = publications.get("Spotify", {})
+        if spotify:
+            description = spotify.get('Description', 'N/A')
+            lines.append("### Spotify")
+            lines.append("This is what will be posted on Spotify\n\n")
+            lines.append(f"**Title**:\n\n{spotify.get('Title', 'N/A')}\n\n")
+            lines.append(f"**Description**:\n\n{description}\n\n")
 
     lines.append("## Transcript\n")
     
