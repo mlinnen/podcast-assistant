@@ -14,7 +14,7 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
 - **Marketing Content**: Generates optimized YouTube titles, descriptions (with line breaks), and Facebook posts.
 - **YouTube Publishing**: Automatically publish generated videos to YouTube with SEO-optimized metadata.
 - **Video Creation**: Creates an MP4 video by looping an image over the audio.
-- **Transcript Review**: Exports a formatted Markdown document (`_review.md`) for easy proofreading.
+- **Transcript Review**: Exports a formatted PDF document (`_review.pdf`) for easy proofreading (a Markdown version is also generated).
 - **Metadata**: Extracts file metadata (size, dates, duration).
 
 ## Prerequisites
@@ -111,7 +111,8 @@ out/
   sample_audio/
     sample_audio.wav       # Copy of the original file
     sample_audio.json      # Full transcription results and marketing content
-    sample_audio_review.md # Formatted review document
+    sample_audio_review.md # Formatted review document (Markdown)
+    sample_audio_review.pdf # Formatted review document (PDF) for proofreading
     sample_audio.mp4       # Generated video (if --video is used)
 ```
 
