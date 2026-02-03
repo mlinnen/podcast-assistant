@@ -14,6 +14,7 @@ def test_pdf_generation():
         "Topics": [
             {"Start": "00:00:00", "Text": "Introduction"}
         ],
+        "Summary": "A test summary of the audio content.",
         "Publications": {
             "YouTube": {
                 "Title": "Test Episode",
