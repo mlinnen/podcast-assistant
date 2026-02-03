@@ -42,6 +42,7 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     - Post: A compelling post for Facebook.
     - IMPORTANT: Do NOT include any actual URLs extracted from the text in the Facebook post.
     - Focus on engagement and storytelling.
+    - IMPORTANT: Avoid using em-dashes (—) or extra dashes between words. Use standard punctuation (commas, periods, or colons) instead.
     - Include 2-3 relevant hashtags at the end.
     - AFTER the hashtags, on a new line, add the placeholder text "[INSERT YOUTUBE URL HERE]".
     

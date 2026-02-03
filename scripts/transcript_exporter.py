@@ -13,6 +13,7 @@ def export_review_document(transcription_data, output_dir):
     lines = []
     lines.append(f"# Transcript Review: {transcription_data.get('FileName', 'Unknown')}")
     lines.append(f"**Length**: {transcription_data.get('LengthOfAudio', 'Unknown')}")
+    lines.append(f"\n")
     
     # Add Video Link/Info at the beginning
     video_info = transcription_data.get("Publications", {}).get("Video", {})
@@ -26,7 +27,6 @@ def export_review_document(transcription_data, output_dir):
     
     publications = transcription_data.get("Publications", {})
     if publications:
-        lines.append("\n---\n")
         lines.append("## Marketing Publications\n")
         
         youtube = publications.get("YouTube", {})
@@ -42,7 +42,6 @@ def export_review_document(transcription_data, output_dir):
             lines.append("### Facebook")
             lines.append(f"**Post**:\n\n{post}\n")
 
-    lines.append("\n---\n")
     lines.append("## Transcript\n")
     
     for entry in transcription_data.get("Dialog", []):
