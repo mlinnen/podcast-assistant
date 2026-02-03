@@ -53,7 +53,7 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     - AFTER the hashtags, on a new line, add the placeholder text "[INSERT YOUTUBE URL HERE]".
     
     SPOTIFY REQUIREMENTS:
-    - Title: A professional podcast episode title.
+    - Title: Use the exact same title as the YouTube Title.
     - Description: A detailed and professional show notes summary.
     - Include topics (using a hyphen '-' as the bullet point for each item) and any relevant links.
     - IMPORTANT: Use literal '\n' characters to create line breaks.
