@@ -12,11 +12,11 @@ def export_review_document(transcription_data, output_dir):
     
     lines = []
     lines.append(f"# Transcript Review: {transcription_data.get('FileName', 'Unknown')}")
-    lines.append(f"**Length**: {transcription_data.get('LengthOfAudio', 'Unknown')}")
+    lines.append(f"**Length**: {transcription_data.get('LengthOfAudio', 'Unknown')}  ")
     
     summary = transcription_data.get("Summary")
     if summary:
-        lines.append(f"**Summary**: {summary}")
+        lines.append(f"**Summary**: {summary}  ")
     
     lines.append("\n")
     
@@ -39,13 +39,13 @@ def export_review_document(transcription_data, output_dir):
             description = youtube.get('Description', 'N/A')
             lines.append("### YouTube")
             lines.append(f"**Title**:\n\n{youtube.get('Title', 'N/A')}\n\n")
-            lines.append(f"**Description**:\n\n{description}\n")
+            lines.append(f"**Description**:\n\n{description}")
             
         facebook = publications.get("Facebook", {})
         if facebook:
             post = facebook.get('Post', 'N/A')
             lines.append("### Facebook")
-            lines.append(f"**Post**:\n{post}\n")
+            lines.append(f"**Post**:\n\n{post}")
 
     lines.append("## Transcript\n")
     
