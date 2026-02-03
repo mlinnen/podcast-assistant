@@ -1,4 +1,5 @@
 import os
+from scripts import md_to_pdf
 
 def export_review_document(transcription_data, output_dir):
     """
@@ -56,5 +57,9 @@ def export_review_document(transcription_data, output_dir):
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
+    
+    # Generate PDF version
+    pdf_path = os.path.join(output_dir, f"{file_name_base}_review.pdf")
+    md_to_pdf.convert_md_to_pdf(output_path, pdf_path)
     
     return output_filename
