@@ -38,6 +38,7 @@ def export_review_document(transcription_data, output_dir):
         if youtube:
             description = youtube.get('Description', 'N/A')
             lines.append("### YouTube")
+            lines.append("This is what will be posted on YouTube\n\n")
             lines.append(f"**Title**:\n\n{youtube.get('Title', 'N/A')}\n\n")
             lines.append(f"**Description**:\n\n{description}")
             
@@ -45,7 +46,8 @@ def export_review_document(transcription_data, output_dir):
         if facebook:
             post = facebook.get('Post', 'N/A')
             lines.append("### Facebook")
-            lines.append(f"**Post**:\n\n{post}")
+            lines.append("This is what will be posted on Facebook\n\n")
+            lines.append(f"**Description**:\n\n{post}")
 
     lines.append("## Transcript\n")
     
