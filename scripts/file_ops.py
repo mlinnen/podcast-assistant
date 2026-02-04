@@ -48,13 +48,7 @@ def create_output_directory(audio_file_path, base_out_dir="out", campaign=None, 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
-    # If it's an episode (either explicitly or via filename), create standard subfolders
-    if episode or audio_file_path:
-        for sub in ["artifacts", "publications"]:
-            sub_path = os.path.join(output_dir, sub)
-            if not os.path.exists(sub_path):
-                os.makedirs(sub_path)
-        
+    
     return output_dir
 
 def ensure_campaign_directories(campaign, base_out_dir="out"):
@@ -71,20 +65,11 @@ def ensure_episode_directory(campaign, episode, base_out_dir="out"):
     if not os.path.exists(episode_dir):
         os.makedirs(episode_dir)
     
-    # Create standard subfolders
-    for sub in ["artifacts", "publications"]:
-        sub_path = os.path.join(episode_dir, sub)
-        if not os.path.exists(sub_path):
-            os.makedirs(sub_path)
-            
     return episode_dir
 
 def save_results(output_dir, audio_file_path, data):
     """Saves the JSON result and copies the audio file to the output directory."""
     dest_dir = output_dir
-    publications_dir = os.path.join(output_dir, "publications")
-    if os.path.exists(publications_dir):
-        dest_dir = publications_dir
 
     # Copy audio file only if it's not already in the destination directory
     dest_path = os.path.join(dest_dir, os.path.basename(audio_file_path))

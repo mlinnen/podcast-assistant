@@ -56,11 +56,11 @@ def main():
     # Artifact-relative resolution
     if not os.path.exists(audio_path) and args.campaign and args.episode:
         filename = os.path.basename(args.file)
-        # Check in the artifacts folder of the campaign/episode
-        artifacts_dir = os.path.join("out", args.campaign, args.episode, "artifacts")
+        # Check in the campaign/episode folder directly
+        artifacts_dir = os.path.join("out", args.campaign, args.episode)
         candidate_path = os.path.abspath(os.path.join(artifacts_dir, filename))
         if os.path.exists(candidate_path):
-            print(f"File not found at literal path, found in artifacts: {candidate_path}")
+            print(f"File not found at literal path, found in episode folder: {candidate_path}")
             audio_path = candidate_path
 
     if not os.path.exists(audio_path):
@@ -137,11 +137,7 @@ def main():
 
         # 6. Export Transcript Review Document
         print("Exporting review document...")
-        publications_dir = os.path.join(output_dir, "publications")
-        if not os.path.exists(publications_dir):
-            os.makedirs(publications_dir)
-            
-        review_file = transcript_exporter.export_review_document(final_output, publications_dir)
+        review_file = transcript_exporter.export_review_document(final_output, output_dir)
         
         if "Publications" not in final_output:
             final_output["Publications"] = {}
@@ -160,12 +156,7 @@ def main():
             
             if not video_exists:
                 print("Creating video...")
-                # Ensure publications dir exists (it should, but just in case)
-                publications_dir = os.path.join(output_dir, "publications")
-                if not os.path.exists(publications_dir):
-                    os.makedirs(publications_dir)
-
-                video_path = video_creator.create_video(audio_path, args.video, publications_dir)
+                video_path = video_creator.create_video(audio_path, args.video, output_dir)
                 if video_path:
                     if "Publications" not in final_output:
                         final_output["Publications"] = {}
@@ -180,9 +171,7 @@ def main():
             video_info = final_output.get("Publications", {}).get("Video")
             if video_info and "VideoFile" in video_info:
                 video_filename = video_info["VideoFile"]
-                # Video is now expected in the publications folder
-                publications_dir = os.path.join(output_dir, "publications")
-                video_path = os.path.join(publications_dir, video_filename)
+                video_path = os.path.join(output_dir, video_filename)
                 
                 if os.path.exists(video_path):
                     # Check if already published
@@ -227,8 +216,7 @@ def main():
                             
                             # Re-export the review document to reflect the updated Facebook post
                             print("Updating review document...")
-                            publications_dir = os.path.join(output_dir, "publications")
-                            transcript_exporter.export_review_document(final_output, publications_dir)
+                            transcript_exporter.export_review_document(final_output, output_dir)
                 else:
                     print(f"Warning: Video file not found at {video_path}. Cannot publish.")
             else:
