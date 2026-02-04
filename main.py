@@ -63,6 +63,17 @@ def main():
             print(f"File not found at literal path, found in episode folder: {candidate_path}")
             audio_path = candidate_path
 
+    # Video artifact-relative resolution
+    if args.video:
+        video_image_path = os.path.abspath(args.video)
+        if not os.path.exists(video_image_path) and args.campaign and args.episode:
+            filename = os.path.basename(args.video)
+            artifacts_dir = os.path.join("out", args.campaign, args.episode)
+            candidate_path = os.path.abspath(os.path.join(artifacts_dir, filename))
+            if os.path.exists(candidate_path):
+                print(f"Video image not found at literal path, found in episode folder: {candidate_path}")
+                args.video = candidate_path
+
     if not os.path.exists(audio_path):
         print(f"Error: File not found at {audio_path}")
         sys.exit(1)
