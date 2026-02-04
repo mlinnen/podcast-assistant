@@ -17,15 +17,34 @@ load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser(description="Audio Transcriber CLI using Google Gemini")
-    parser.add_argument("--file", required=True, help="Path to the audio file")
+    parser.add_argument("--file", help="Path to the audio file")
     parser.add_argument("--speakers", type=int, default=2, help="Expected number of speakers")
     parser.add_argument("--api-key", help="Google API Key (optional if GOOGLE_API_KEY env var is set)")
     parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model to use")
     parser.add_argument("--video", help="Path to an image file to create a video from the audio")
     parser.add_argument("--publish", action="store_true", help="Publish the generated video to YouTube")
+    parser.add_argument("-c", "--campaign", help="Optional campaign name to group output files")
+    parser.add_argument("-e", "--episode", help="Optional episode name for subfolder under campaign")
     
     args = parser.parse_args()
     
+    if not args.file and not args.campaign:
+        print("Error: Either --file or --campaign must be provided.")
+        parser.print_help()
+        sys.exit(1)
+
+    # Handle standalone campaign/episode creation
+    if args.campaign and not args.file:
+        if args.episode:
+            print(f"Initializing directories for campaign: {args.campaign}, episode: {args.episode}")
+            episode_dir = file_ops.ensure_episode_directory(args.campaign, args.episode)
+            print(f"Success! Episode directory ensured at {episode_dir}")
+        else:
+            print(f"Initializing directories for campaign: {args.campaign}")
+            campaign_dir = file_ops.ensure_campaign_directories(args.campaign)
+            print(f"Success! Campaign directory ensured at {campaign_dir}")
+        sys.exit(0)
+
     # Resolve API Key
     api_key = args.api_key or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -33,17 +52,66 @@ def main():
         sys.exit(1)
         
     audio_path = os.path.abspath(args.file)
+    original_audio_path = audio_path  # Store original path for video resolution
+    
+    # Artifact-relative resolution
+    if not os.path.exists(audio_path) and args.campaign and args.episode:
+        filename = os.path.basename(args.file)
+        # Check in the campaign/episode folder directly
+        artifacts_dir = os.path.join("out", args.campaign, args.episode)
+        candidate_path = os.path.abspath(os.path.join(artifacts_dir, filename))
+        if os.path.exists(candidate_path):
+            print(f"File not found at literal path, found in episode folder: {candidate_path}")
+            audio_path = candidate_path
+
+    # Video artifact-relative resolution
+    if args.video:
+        video_image_path = os.path.abspath(args.video)
+        
+        # First, check in the same directory as the ORIGINAL (unresolved) audio file
+        if not os.path.exists(video_image_path):
+            filename = os.path.basename(args.video)
+            original_audio_dir = os.path.dirname(original_audio_path)
+            candidate_path = os.path.abspath(os.path.join(original_audio_dir, filename))
+            if os.path.exists(candidate_path):
+                print(f"Video image not found at literal path, found in original audio folder: {candidate_path}")
+                args.video = candidate_path
+        
+        # Second, check in the same directory as the RESOLVED audio file (if different)
+        video_image_path = os.path.abspath(args.video)
+        if not os.path.exists(video_image_path) and audio_path != original_audio_path:
+            filename = os.path.basename(args.video)
+            audio_dir = os.path.dirname(audio_path)
+            candidate_path = os.path.abspath(os.path.join(audio_dir, filename))
+            if os.path.exists(candidate_path):
+                print(f"Video image found in resolved audio folder: {candidate_path}")
+                args.video = candidate_path
+        
+        # Third, check in the campaign/episode output folder
+        video_image_path = os.path.abspath(args.video)
+        if not os.path.exists(video_image_path) and args.campaign and args.episode:
+            filename = os.path.basename(args.video)
+            artifacts_dir = os.path.join("out", args.campaign, args.episode)
+            candidate_path = os.path.abspath(os.path.join(artifacts_dir, filename))
+            if os.path.exists(candidate_path):
+                print(f"Video image found in episode output folder: {candidate_path}")
+                args.video = candidate_path
+
     if not os.path.exists(audio_path):
         print(f"Error: File not found at {audio_path}")
         sys.exit(1)
         
     print(f"Processing {audio_path}...")
+    if args.campaign:
+        print(f"Campaign: {args.campaign}")
+    if args.episode:
+        print(f"Episode: {args.episode}")
     print(f"Model: {args.model}")
     print(f"Speakers: {args.speakers}")
     
     try:
         # Determine output paths
-        output_dir, json_path = file_ops.get_output_paths(audio_path)
+        output_dir, json_path = file_ops.get_output_paths(audio_path, campaign=args.campaign, episode=args.episode)
         
         # Initialize final_output
         final_output = {}
@@ -99,7 +167,7 @@ def main():
             print("Skipping marketing content generation (already exists).")
         
         # Create output directory once for all subsequent file operations
-        output_dir = file_ops.create_output_directory(audio_path)
+        output_dir = file_ops.create_output_directory(audio_path, campaign=args.campaign, episode=args.episode)
 
         # 6. Export Transcript Review Document
         print("Exporting review document...")
