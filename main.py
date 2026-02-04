@@ -52,6 +52,7 @@ def main():
         sys.exit(1)
         
     audio_path = os.path.abspath(args.file)
+    original_audio_path = audio_path  # Store original path for video resolution
     
     # Artifact-relative resolution
     if not os.path.exists(audio_path) and args.campaign and args.episode:
@@ -66,12 +67,34 @@ def main():
     # Video artifact-relative resolution
     if args.video:
         video_image_path = os.path.abspath(args.video)
+        
+        # First, check in the same directory as the ORIGINAL (unresolved) audio file
+        if not os.path.exists(video_image_path):
+            filename = os.path.basename(args.video)
+            original_audio_dir = os.path.dirname(original_audio_path)
+            candidate_path = os.path.abspath(os.path.join(original_audio_dir, filename))
+            if os.path.exists(candidate_path):
+                print(f"Video image not found at literal path, found in original audio folder: {candidate_path}")
+                args.video = candidate_path
+        
+        # Second, check in the same directory as the RESOLVED audio file (if different)
+        video_image_path = os.path.abspath(args.video)
+        if not os.path.exists(video_image_path) and audio_path != original_audio_path:
+            filename = os.path.basename(args.video)
+            audio_dir = os.path.dirname(audio_path)
+            candidate_path = os.path.abspath(os.path.join(audio_dir, filename))
+            if os.path.exists(candidate_path):
+                print(f"Video image found in resolved audio folder: {candidate_path}")
+                args.video = candidate_path
+        
+        # Third, check in the campaign/episode output folder
+        video_image_path = os.path.abspath(args.video)
         if not os.path.exists(video_image_path) and args.campaign and args.episode:
             filename = os.path.basename(args.video)
             artifacts_dir = os.path.join("out", args.campaign, args.episode)
             candidate_path = os.path.abspath(os.path.join(artifacts_dir, filename))
             if os.path.exists(candidate_path):
-                print(f"Video image not found at literal path, found in episode folder: {candidate_path}")
+                print(f"Video image found in episode output folder: {candidate_path}")
                 args.video = candidate_path
 
     if not os.path.exists(audio_path):
