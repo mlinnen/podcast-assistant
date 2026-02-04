@@ -17,15 +17,34 @@ load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser(description="Audio Transcriber CLI using Google Gemini")
-    parser.add_argument("--file", required=True, help="Path to the audio file")
+    parser.add_argument("--file", help="Path to the audio file")
     parser.add_argument("--speakers", type=int, default=2, help="Expected number of speakers")
     parser.add_argument("--api-key", help="Google API Key (optional if GOOGLE_API_KEY env var is set)")
     parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model to use")
     parser.add_argument("--video", help="Path to an image file to create a video from the audio")
     parser.add_argument("--publish", action="store_true", help="Publish the generated video to YouTube")
+    parser.add_argument("-c", "--campaign", help="Optional campaign name to group output files")
+    parser.add_argument("-e", "--episode", help="Optional episode name for subfolder under campaign")
     
     args = parser.parse_args()
     
+    if not args.file and not args.campaign:
+        print("Error: Either --file or --campaign must be provided.")
+        parser.print_help()
+        sys.exit(1)
+
+    # Handle standalone campaign/episode creation
+    if args.campaign and not args.file:
+        if args.episode:
+            print(f"Initializing directories for campaign: {args.campaign}, episode: {args.episode}")
+            episode_dir = file_ops.ensure_episode_directory(args.campaign, args.episode)
+            print(f"Success! Episode directory ensured at {episode_dir}")
+        else:
+            print(f"Initializing directories for campaign: {args.campaign}")
+            campaign_dir = file_ops.ensure_campaign_directories(args.campaign)
+            print(f"Success! Campaign directory ensured at {campaign_dir}")
+        sys.exit(0)
+
     # Resolve API Key
     api_key = args.api_key or os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -33,17 +52,32 @@ def main():
         sys.exit(1)
         
     audio_path = os.path.abspath(args.file)
+    
+    # Artifact-relative resolution
+    if not os.path.exists(audio_path) and args.campaign and args.episode:
+        filename = os.path.basename(args.file)
+        # Check in the artifacts folder of the campaign/episode
+        artifacts_dir = os.path.join("out", args.campaign, args.episode, "artifacts")
+        candidate_path = os.path.abspath(os.path.join(artifacts_dir, filename))
+        if os.path.exists(candidate_path):
+            print(f"File not found at literal path, found in artifacts: {candidate_path}")
+            audio_path = candidate_path
+
     if not os.path.exists(audio_path):
         print(f"Error: File not found at {audio_path}")
         sys.exit(1)
         
     print(f"Processing {audio_path}...")
+    if args.campaign:
+        print(f"Campaign: {args.campaign}")
+    if args.episode:
+        print(f"Episode: {args.episode}")
     print(f"Model: {args.model}")
     print(f"Speakers: {args.speakers}")
     
     try:
         # Determine output paths
-        output_dir, json_path = file_ops.get_output_paths(audio_path)
+        output_dir, json_path = file_ops.get_output_paths(audio_path, campaign=args.campaign, episode=args.episode)
         
         # Initialize final_output
         final_output = {}
@@ -99,11 +133,15 @@ def main():
             print("Skipping marketing content generation (already exists).")
         
         # Create output directory once for all subsequent file operations
-        output_dir = file_ops.create_output_directory(audio_path)
+        output_dir = file_ops.create_output_directory(audio_path, campaign=args.campaign, episode=args.episode)
 
         # 6. Export Transcript Review Document
         print("Exporting review document...")
-        review_file = transcript_exporter.export_review_document(final_output, output_dir)
+        publications_dir = os.path.join(output_dir, "publications")
+        if not os.path.exists(publications_dir):
+            os.makedirs(publications_dir)
+            
+        review_file = transcript_exporter.export_review_document(final_output, publications_dir)
         
         if "Publications" not in final_output:
             final_output["Publications"] = {}
@@ -122,7 +160,12 @@ def main():
             
             if not video_exists:
                 print("Creating video...")
-                video_path = video_creator.create_video(audio_path, args.video, output_dir)
+                # Ensure publications dir exists (it should, but just in case)
+                publications_dir = os.path.join(output_dir, "publications")
+                if not os.path.exists(publications_dir):
+                    os.makedirs(publications_dir)
+
+                video_path = video_creator.create_video(audio_path, args.video, publications_dir)
                 if video_path:
                     if "Publications" not in final_output:
                         final_output["Publications"] = {}
@@ -137,7 +180,9 @@ def main():
             video_info = final_output.get("Publications", {}).get("Video")
             if video_info and "VideoFile" in video_info:
                 video_filename = video_info["VideoFile"]
-                video_path = os.path.join(output_dir, video_filename)
+                # Video is now expected in the publications folder
+                publications_dir = os.path.join(output_dir, "publications")
+                video_path = os.path.join(publications_dir, video_filename)
                 
                 if os.path.exists(video_path):
                     # Check if already published
@@ -182,7 +227,8 @@ def main():
                             
                             # Re-export the review document to reflect the updated Facebook post
                             print("Updating review document...")
-                            transcript_exporter.export_review_document(final_output, output_dir)
+                            publications_dir = os.path.join(output_dir, "publications")
+                            transcript_exporter.export_review_document(final_output, publications_dir)
                 else:
                     print(f"Warning: Video file not found at {video_path}. Cannot publish.")
             else:
