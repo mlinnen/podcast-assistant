@@ -2,6 +2,26 @@ from google import genai
 from google.genai import types
 import json
 import typing_extensions as typing
+import re
+
+def ensure_url_protocol(text):
+    """
+    Finds URLs in the text that don't have a protocol (e.g., google.com) 
+    and adds 'https://' to them.
+    """
+    # Regex to find potential URLs
+    url_pattern = r'\b(?:https?://|www\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:/[^\s]*)?'
+    
+    def replace_url(match):
+        url = match.group(0)
+        # Skip if it already has a protocol or is an email
+        if url.startswith("http://") or url.startswith("https://") or "@" in url:
+            return url
+        if url.startswith("www."):
+            return f"https://{url}"
+        return f"https://{url}"
+
+    return re.sub(url_pattern, replace_url, text)
 
 class YouTubeMarketing(typing.TypedDict):
     Title: str
@@ -40,7 +60,7 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     - YouTubeDescription: A brief, compelling summary.
     - IMPORTANT: Use literal '\n' characters to create line breaks and separate sections (e.g., Summary, Topics, URLs, Hashtags).
     - Topics: A section titled "Topics:" followed by a list of topics using a hyphen '-' as the bullet point for each item, with their "Start" timestamps from the provided topics below. This should come BEFORE the URLs.
-    - URLs: Any URLs mentioned in the text MUST be extracted and listed at the end of the description as a list using a hyphen '-' as the bullet point for each item.
+    - URLs: Any URLs mentioned in the text MUST be extracted and listed at the end of the description as a list using a hyphen '-' as the bullet point for each item. IMPORTANT: Each URL MUST be prefixed with 'https://' (e.g., https://google.com).
     - Hashtags: 3-5 relevant hashtags after the URLs list.
     
     FACEBOOK REQUIREMENTS:
@@ -88,4 +108,13 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
         )
     )
     
-    return json.loads(response.text)
+    result = json.loads(response.text)
+    
+    # Post-process to ensure all URLs have https://
+    if "YouTube" in result and "Description" in result["YouTube"]:
+        result["YouTube"]["Description"] = ensure_url_protocol(result["YouTube"]["Description"])
+    
+    if "Spotify" in result and "Description" in result["Spotify"]:
+        result["Spotify"]["Description"] = ensure_url_protocol(result["Spotify"]["Description"])
+        
+    return result
