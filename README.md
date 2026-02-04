@@ -80,6 +80,27 @@ Transcribe, create a video, and publish to YouTube:
 python main.py --file path/to/audio.wav --video path/to/image.png --publish
 ```
 
+### Campaigns and Episodes
+
+Organize your content by campaign and episode.
+
+**Initialize directories without checking for a file:**
+```bash
+python main.py -c "MyCampaign" -e "Episode1"
+```
+
+**Process a file and sort it into the campaign structure:**
+```bash
+python main.py -c "MyCampaign" -e "Episode1" --file path/to/audio.wav
+```
+
+**Smart File Resolution:**
+If you place your audio file in `out/MyCampaign/Episode1/audio.wav`, you can run:
+```bash
+python main.py -c "MyCampaign" -e "Episode1" --file audio.wav
+```
+The tool will automatically look for `audio.wav` in the campaign folder if it isn't found at the provided path.
+
 ### Arguments
 
 | Argument | Description | Default |
@@ -101,6 +122,13 @@ You can list all Gemini models available to your API key by running:
 python scripts/list_models.py
 ```
 
+### Verification Scripts
+
+Run output structure verification tests:
+```bash
+python test/verify_episodes.py
+```
+
 ## Output
 
 The tool creates an `out` directory containing a folder named after the audio file for each run. Existing files in the folder are overwritten on subsequent runs.
@@ -108,12 +136,13 @@ The tool creates an `out` directory containing a folder named after the audio fi
 **Structure:**
 ```
 out/
-  sample_audio/
-    sample_audio.wav       # Copy of the original file
-    sample_audio.json      # Full transcription results and marketing content
-    sample_audio_review.md # Formatted review document (Markdown)
-    sample_audio_review.pdf # Formatted review document (PDF) for proofreading
-    sample_audio.mp4       # Generated video (if --video is used)
+  {campaign_name}/
+    {episode_name}/
+      {episode_name}.json      # Full transcription results and marketing content
+      {episode_name}_review.md # Formatted review document (Markdown)
+      {episode_name}_review.pdf # Formatted review document (PDF)
+      {episode_name}.mp4       # Generated video (if --video is used)
+      {audio_filename}         # Copy of the source audio file
 ```
 
 **JSON Output Example:**
