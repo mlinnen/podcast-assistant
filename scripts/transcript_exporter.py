@@ -36,11 +36,50 @@ def export_review_document(transcription_data, output_dir):
         
         youtube = publications.get("YouTube", {})
         if youtube:
-            description = youtube.get('Description', 'N/A')
             lines.append("### YouTube")
             lines.append("This is what will be posted on YouTube\n\n")
             lines.append(f"**Title**:\n\n{youtube.get('Title', 'N/A')}\n\n")
-            lines.append(f"**Description**:\n\n{description}\n\n")
+            
+            # Check if new structured format or old format
+            if "ShortDescription" in youtube:
+                # New structured format - show breakdown
+                lines.append("**Short Description** (appears before 'show more'):\n\n")
+                lines.append(f"{youtube.get('ShortDescription', 'N/A')}\n\n")
+                
+                lines.append("**Description Body**:\n\n")
+                lines.append(f"{youtube.get('DescriptionBody', 'N/A')}\n\n")
+                
+                topics = youtube.get('Topics', [])
+                if topics:
+                    lines.append("**Topics**:\n\n")
+                    for topic in topics:
+                        start = topic.get('Start', '')
+                        text = topic.get('Text', '')
+                        lines.append(f"- {start} {text}\n")
+                    lines.append("\n")
+                
+                urls = youtube.get('URLs', [])
+                if urls:
+                    lines.append("**URLs**:\n\n")
+                    for url in urls:
+                        lines.append(f"- {url}\n")
+                    lines.append("\n")
+                
+                hashtags = youtube.get('Hashtags', [])
+                if hashtags:
+                    lines.append("**Hashtags**:\n\n")
+                    hashtag_str = " ".join([f"#{tag}" for tag in hashtags])
+                    lines.append(f"{hashtag_str}\n\n")
+                
+                # Also show the final assembled description
+                from scripts import marketing_generator
+                assembled = marketing_generator.assemble_youtube_description(youtube)
+                lines.append("**Final Assembled Description**:\n\n")
+                lines.append(f"```\n{assembled}\n```\n\n")
+            else:
+                # Old format - single description field
+                description = youtube.get('Description', 'N/A')
+                lines.append(f"**Description**:\n\n{description}\n\n")
             
         facebook = publications.get("Facebook", {})
         if facebook:

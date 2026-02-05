@@ -23,7 +23,9 @@ def main():
     parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model to use")
     parser.add_argument("--video", help="Path to an image file to create a video from the audio")
     parser.add_argument("--publish", action="store_true", help="Publish the generated video to YouTube")
+    parser.add_argument("--force-marketing", action="store_true", help="Force re-generation of marketing content")
     parser.add_argument("-c", "--campaign", help="Optional campaign name to group output files")
+
     parser.add_argument("-e", "--episode", help="Optional episode name for subfolder under campaign")
     
     args = parser.parse_args()
@@ -148,10 +150,23 @@ def main():
         
         # 5. Extract Text and Generate Marketing Content
         marketing_keys = ["Facebook", "YouTube"]
-        has_marketing = "Publications" in final_output and all(k in final_output["Publications"] for k in marketing_keys)
+        existing_publications = final_output.get("Publications", {})
+        has_marketing = all(k in existing_publications for k in marketing_keys)
         
-        if not has_marketing:
-            print("Generating marketing content...")
+        # Check if YouTube data is in the old format (missing structured fields)
+        is_old_youtube_format = False
+        if "YouTube" in existing_publications:
+            if "ShortDescription" not in existing_publications["YouTube"]:
+                is_old_youtube_format = True
+        
+        if args.force_marketing or not has_marketing or is_old_youtube_format:
+            if args.force_marketing:
+                print("Force-generating marketing content...")
+            elif is_old_youtube_format:
+                print("Old YouTube format detected. Re-generating marketing content...")
+            else:
+                print("Generating marketing content...")
+
             dialogue_text = extract_text.extract_dialogue_from_data(final_output)
             if dialogue_text:
                 marketing_content = marketing_generator.generate_marketing_content(
@@ -235,9 +250,9 @@ def main():
                         
                         youtube_data = final_output.get("Publications", {}).get("YouTube", {})
                         title = youtube_data.get("Title", "Podcast Episode")
-                        description = youtube_data.get("Description", "")
                         
-                        video_id = youtube_publisher.publish_video(video_path, title, description)
+                        # Pass the entire youtube_data dict; youtube_publisher will handle old vs new format
+                        video_id = youtube_publisher.publish_video(video_path, title, youtube_data)
                         if video_id:
                             video_info["YouTubeVideoID"] = video_id
                             
