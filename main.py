@@ -343,26 +343,16 @@ def main():
             if 'json_path' in locals() and json_path and os.path.exists(json_path):
                 files_to_upload.append(json_path)
 
-            # 4. Images (Square & Thumbnail)
+            # 4. Images (All in output dir)
             base_name = os.path.splitext(os.path.basename(audio_path))[0]
             
-            # Square Image
-            # Note: output_dir is where artifacts are, so check there? 
-            # Actually episode_dir usually == output_dir. output_dir is defined above.
-            
-            # Square Image
-            square_img = os.path.join(output_dir, f"{base_name}.png")
-            if os.path.exists(square_img):
-                files_to_upload.append(square_img)
-                
-            # YouTube Thumbnail
-            potential_images = [
-                os.path.join(output_dir, f"{base_name}.jpg"),
-                os.path.join(output_dir, f"{base_name}_thumbnail.jpg")
-            ]
-            for img_path in potential_images:
-                if os.path.exists(img_path):
-                     files_to_upload.append(img_path)
+            image_extensions = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+            if os.path.exists(output_dir):
+                for f in os.listdir(output_dir):
+                    if os.path.splitext(f)[1].lower() in image_extensions:
+                        img_path = os.path.join(output_dir, f)
+                        if img_path not in files_to_upload:
+                            files_to_upload.append(img_path)
 
             # 5. Video File
             # Check if video info is in final_output
