@@ -242,7 +242,8 @@ def main():
                     if "Publications" not in final_output:
                         final_output["Publications"] = {}
                     final_output["Publications"]["Video"] = {
-                        "VideoFile": os.path.basename(video_path)
+                        "VideoFile": os.path.basename(video_path),
+                        "ImageFile": os.path.basename(args.video)
                     }
             else:
                 print("Skipping video creation (already exists).")
