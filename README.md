@@ -15,7 +15,9 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
 - **Content Re-generation**: Detects old description formats and allows forced updates via the `--force-marketing` flag.
 
 - **YouTube Publishing**: Automatically publish generated videos to YouTube with SEO-optimized metadata.
+- **Google Drive Integration**: Automatically upload original audio, review documents, and assets to a structured folder hierarchy on Google Drive.
 - **Video Creation**: Creates an MP4 video by looping an image over the audio.
+
 - **Transcript Review**: Exports a formatted PDF document (`_review.pdf`) for easy proofreading (a Markdown version is also generated).
 - **Metadata**: Extracts file metadata (size, dates, duration).
 
@@ -114,6 +116,13 @@ The tool will automatically look for `audio.wav` in the campaign folder if it is
 | `--publish` | Publish the generated video to YouTube (requires setup) | `False` |
 | `--force-marketing` | Force re-generation of marketing content (YouTube/Facebook/Spotify) | `False` |
 | `--api-key` | Google API Key (can also set via `GOOGLE_API_KEY` env var) | - |
+| `-c`, `--campaign` | Campaign name to organize output files | - |
+| `-e`, `--episode` | Episode name (subfolder under campaign) | - |
+| `--link` | Custom link to add to YouTube description (format: `URL\|Label`) | - |
+| `--hashtag` | Custom hashtag to add (overrides generated tags) | - |
+| `--upload-drive` | Upload output files to Google Drive | `False` |
+| `--drive-root` | Root folder name on Google Drive | `podcasts` |
+
 
 
 ## Utility Scripts
