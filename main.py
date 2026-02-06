@@ -26,7 +26,11 @@ def main():
     parser.add_argument("--force-marketing", action="store_true", help="Force re-generation of marketing content")
     parser.add_argument("--link", action="append", help="Custom link to add to YouTube description (format: 'URL|Label')")
     parser.add_argument("--hashtag", action="append", help="Custom hashtag to add to YouTube description (overrides generated tags)")
+    parser.add_argument("--upload-drive", action="store_true", help="Upload valid output files to Google Drive")
+    parser.add_argument("--drive-root", default="podcasts", help="Root folder name on Google Drive (default: 'podcasts')")
     parser.add_argument("-c", "--campaign", help="Optional campaign name to group output files")
+
+
 
 
 
@@ -305,11 +309,68 @@ def main():
         print(f"Success! Results saved to {output_dir}")
         print(f"JSON: {json_path}")
         
+        # --- Google Drive Upload integration ---
+        if args.upload_drive:
+            from scripts import drive_uploader
+            
+            print("\n--- Starting Google Drive Upload ---")
+            
+            # Determine names for Drive folders
+            campaign_name = args.campaign if args.campaign else "DefaultCampaign"
+            if args.episode:
+                episode_name = args.episode
+            else:
+                episode_name = os.path.splitext(os.path.basename(audio_path))[0]
+
+            # Identify files to upload
+            files_to_upload = []
+            
+            # 1. Original Audio File
+            files_to_upload.append(audio_path)
+            
+            # 2. Review Documents (MD & PDF)
+            if 'review_file' in locals() and review_file:
+                md_path = os.path.join(output_dir, review_file)
+                files_to_upload.append(md_path) # MD
+                
+                # PDF (assume same base name)
+                pdf_path = os.path.splitext(md_path)[0] + ".pdf"
+                if os.path.exists(pdf_path):
+                    files_to_upload.append(pdf_path)
+            
+            # 3. Images (Square & Thumbnail)
+            base_name = os.path.splitext(os.path.basename(audio_path))[0]
+            
+            # Square Image
+            # Note: output_dir is where artifacts are, so check there? 
+            # Actually episode_dir usually == output_dir. output_dir is defined above.
+            
+            # Square Image
+            square_img = os.path.join(output_dir, f"{base_name}.png")
+            if os.path.exists(square_img):
+                files_to_upload.append(square_img)
+                
+            # YouTube Thumbnail
+            potential_images = [
+                os.path.join(output_dir, f"{base_name}.jpg"),
+                os.path.join(output_dir, f"{base_name}_thumbnail.jpg")
+            ]
+            for img_path in potential_images:
+                if os.path.exists(img_path):
+                     files_to_upload.append(img_path)
+
+            drive_uploader.upload_episode_assets(campaign_name, episode_name, files_to_upload, root_folder_name=args.drive_root)
+
+
+        
     except Exception as e:
         print(f"An error occurred: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
 
+
+
 if __name__ == "__main__":
     main()
+
