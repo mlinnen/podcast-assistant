@@ -24,7 +24,9 @@ def main():
     parser.add_argument("--video", help="Path to an image file to create a video from the audio")
     parser.add_argument("--publish", action="store_true", help="Publish the generated video to YouTube")
     parser.add_argument("--force-marketing", action="store_true", help="Force re-generation of marketing content")
+    parser.add_argument("--link", action="append", help="Custom link to add to YouTube description (format: 'URL|Label')")
     parser.add_argument("-c", "--campaign", help="Optional campaign name to group output files")
+
 
     parser.add_argument("-e", "--episode", help="Optional episode name for subfolder under campaign")
     
@@ -167,6 +169,16 @@ def main():
             else:
                 print("Generating marketing content...")
 
+            # Process custom links if provided
+            custom_links = []
+            if args.link:
+                for link_arg in args.link:
+                    if "|" in link_arg:
+                        url, label = link_arg.split("|", 1)
+                        custom_links.append({"Url": url.strip(), "Label": label.strip()})
+                    else:
+                        custom_links.append({"Url": link_arg.strip(), "Label": link_arg.strip()})
+
             dialogue_text = extract_text.extract_dialogue_from_data(final_output)
             if dialogue_text:
                 marketing_content = marketing_generator.generate_marketing_content(
@@ -178,8 +190,14 @@ def main():
                 if "Publications" not in final_output:
                     final_output["Publications"] = {}
                 final_output["Publications"].update(marketing_content)
+                
+                # Add custom links to YouTube data
+                if custom_links:
+                    if "YouTube" in final_output["Publications"]:
+                        final_output["Publications"]["YouTube"]["CustomLinks"] = custom_links
         else:
             print("Skipping marketing content generation (already exists).")
+
         
         # Create output directory once for all subsequent file operations
         output_dir = file_ops.create_output_directory(audio_path, campaign=args.campaign, episode=args.episode)

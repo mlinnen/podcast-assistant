@@ -27,6 +27,10 @@ class TopicEntry(typing.TypedDict):
     Start: str
     Text: str
 
+class CustomLinkEntry(typing.TypedDict):
+    Url: str
+    Label: str
+
 class YouTubeMarketing(typing.TypedDict):
     Title: str
     ShortDescription: str
@@ -34,6 +38,8 @@ class YouTubeMarketing(typing.TypedDict):
     Topics: list[TopicEntry]
     URLs: list[str]
     Hashtags: list[str]
+    CustomLinks: typing.NotRequired[list[CustomLinkEntry]]
+
 
 class FacebookMarketing(typing.TypedDict):
     Post: str
@@ -174,11 +180,24 @@ def assemble_youtube_description(youtube_data):
     
     # URLs section
     urls = youtube_data.get("URLs", [])
-    if urls:
+    custom_links = youtube_data.get("CustomLinks", [])
+    
+    if urls or custom_links:
         parts.append("URLs:")
+        # Show custom links first
+        for link in custom_links:
+            url = link.get("Url", "")
+            label = link.get("Label", "")
+            if label and label != url:
+                parts.append(f"- {label}: {url}")
+            else:
+                parts.append(f"- {url}")
+                
+        # Show discovered links
         for url in urls:
             parts.append(f"- {url}")
         parts.append("")  # Blank line
+
     
     # Hashtags
     hashtags = youtube_data.get("Hashtags", [])

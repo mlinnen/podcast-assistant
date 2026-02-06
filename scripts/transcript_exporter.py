@@ -59,11 +59,23 @@ def export_review_document(transcription_data, output_dir):
                     lines.append("\n")
                 
                 urls = youtube.get('URLs', [])
-                if urls:
+                custom_links = youtube.get('CustomLinks', [])
+                if urls or custom_links:
                     lines.append("**URLs**:\n\n")
+                    # Show custom links first
+                    for link in custom_links:
+                        url = link.get('Url', '')
+                        label = link.get('Label', '')
+                        if label and label != url:
+                            lines.append(f"- {label}: {url}\n")
+                        else:
+                            lines.append(f"- {url}\n")
+                    
+                    # Show discovered links
                     for url in urls:
                         lines.append(f"- {url}\n")
                     lines.append("\n")
+
                 
                 hashtags = youtube.get('Hashtags', [])
                 if hashtags:
