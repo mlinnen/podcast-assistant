@@ -11,7 +11,9 @@ A powerful CLI tool that uses Google's Gemini Multimodal models to transcribe au
   - **Primary**: Identifies the dominant emotion of each segment.
 - **Language Detection**: Identifies the spoken language (e.g., `en-US`).
 - **Summarization**: Generates a concise summary of the entire conversation.
-- **Marketing Content**: Generates optimized YouTube titles, descriptions (with line breaks), and Facebook posts.
+- **Marketing Content**: Generates structured YouTube titles, descriptions (with line breaks, topics, and hashtags), Facebook posts, and Spotify show notes.
+- **Content Re-generation**: Detects old description formats and allows forced updates via the `--force-marketing` flag.
+
 - **YouTube Publishing**: Automatically publish generated videos to YouTube with SEO-optimized metadata.
 - **Video Creation**: Creates an MP4 video by looping an image over the audio.
 - **Transcript Review**: Exports a formatted PDF document (`_review.pdf`) for easy proofreading (a Markdown version is also generated).
@@ -110,7 +112,9 @@ The tool will automatically look for `audio.wav` in the campaign folder if it is
 | `--model` | Gemini model version to use | `gemini-3-flash-preview` |
 | `--video` | Path to an image file to create a video from the audio | - |
 | `--publish` | Publish the generated video to YouTube (requires setup) | `False` |
+| `--force-marketing` | Force re-generation of marketing content (YouTube/Facebook/Spotify) | `False` |
 | `--api-key` | Google API Key (can also set via `GOOGLE_API_KEY` env var) | - |
+
 
 ## Utility Scripts
 
@@ -156,10 +160,18 @@ out/
   "Publications": {
     "YouTube": {
       "Title": "Catchy Title",
-      "Description": "Compelling summary\n\nURLs:\n- example.com"
+      "ShortDescription": "Brief hook for the top of the description.",
+      "DescriptionBody": "Detailed, compelling summary...",
+      "Topics": [{"Start": "00:00:00", "Text": "Introduction"}],
+      "URLs": ["https://example.com"],
+      "Hashtags": ["Tag1", "Tag2"]
     },
     "Facebook": {
       "Post": "Check out our latest episode!"
+    },
+    "Spotify": {
+      "Title": "Catchy Title",
+      "Description": "Professional show notes..."
     },
     "Review": {
       "TranscriptFile": "sample_review.md"
@@ -169,6 +181,7 @@ out/
       "YouTubeVideoID": "dQw4w9WgXcQ"
     }
   }
+
 }
 ```
 

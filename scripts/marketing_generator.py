@@ -23,9 +23,17 @@ def ensure_url_protocol(text):
 
     return re.sub(url_pattern, replace_url, text)
 
+class TopicEntry(typing.TypedDict):
+    Start: str
+    Text: str
+
 class YouTubeMarketing(typing.TypedDict):
     Title: str
-    Description: str
+    ShortDescription: str
+    DescriptionBody: str
+    Topics: list[TopicEntry]
+    URLs: list[str]
+    Hashtags: list[str]
 
 class FacebookMarketing(typing.TypedDict):
     Post: str
@@ -56,12 +64,12 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     Based on the following transcript text and identified topics, generate marketing content for YouTube and Facebook.
     
     YOUTUBE REQUIREMENTS:
-    - YouTubeTitle: Catchy, attention-grabbing, and optimized for search.
-    - YouTubeDescription: A brief, compelling summary.
-    - IMPORTANT: Use literal '\n' characters to create line breaks and separate sections (e.g., Summary, Topics, URLs, Hashtags).
-    - Topics: A section titled "Topics:" followed by a list of topics using a hyphen '-' as the bullet point for each item, with their "Start" timestamps from the provided topics below. This should come BEFORE the URLs.
-    - URLs: Any URLs mentioned in the text MUST be extracted and listed at the end of the description as a list using a hyphen '-' as the bullet point for each item. IMPORTANT: Each URL MUST be prefixed with 'https://' (e.g., https://google.com).
-    - Hashtags: 3-5 relevant hashtags after the URLs list.
+    - Title: Catchy, attention-grabbing, and optimized for search.
+    - ShortDescription: A brief hook (1-2 sentences) that summarizes the content. This appears before the "Show more" button on YouTube.
+    - DescriptionBody: A detailed, compelling summary with proper formatting. Use literal '\n' characters for line breaks.
+    - Topics: An array of topic objects, each with "Start" (timestamp) and "Text" (topic description) fields. Use the provided topics array below as the source.
+    - URLs: An array of all URLs mentioned in the transcript. Each URL MUST be prefixed with 'https://' (e.g., https://google.com). If no URLs are mentioned, return an empty array.
+    - Hashtags: An array of 3-5 relevant hashtags (without the # symbol, just the text).
     
     FACEBOOK REQUIREMENTS:
     - Post: A compelling post for Facebook.
@@ -87,7 +95,14 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     {{
         "YouTube": {{
             "Title": "...",
-            "Description": "..."
+            "ShortDescription": "...",
+            "DescriptionBody": "...",
+            "Topics": [
+                {{"Start": "00:00:00", "Text": "..."}},
+                {{"Start": "00:05:30", "Text": "..."}}
+            ],
+            "URLs": ["https://example.com", "https://another.com"],
+            "Hashtags": ["Keyword1", "Keyword2", "Keyword3"]
         }},
         "Facebook": {{
             "Post": "..."
@@ -111,10 +126,65 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     result = json.loads(response.text)
     
     # Post-process to ensure all URLs have https://
-    if "YouTube" in result and "Description" in result["YouTube"]:
-        result["YouTube"]["Description"] = ensure_url_protocol(result["YouTube"]["Description"])
+    if "YouTube" in result and "URLs" in result["YouTube"]:
+        result["YouTube"]["URLs"] = [ensure_url_protocol(url) for url in result["YouTube"]["URLs"]]
     
     if "Spotify" in result and "Description" in result["Spotify"]:
         result["Spotify"]["Description"] = ensure_url_protocol(result["Spotify"]["Description"])
         
     return result
+
+def assemble_youtube_description(youtube_data):
+    """
+    Assembles a formatted YouTube description from structured data.
+    
+    Args:
+        youtube_data: Dictionary containing YouTube marketing fields (ShortDescription, 
+                     DescriptionBody, Topics, URLs, Hashtags)
+    
+    Returns:
+        Formatted description string ready for YouTube
+    """
+    # Handle both old format (single Description) and new format (structured)
+    if "Description" in youtube_data and "ShortDescription" not in youtube_data:
+        # Old format - return as-is for backward compatibility
+        return youtube_data["Description"]
+    
+    parts = []
+    
+    # Short description (appears before "show more")
+    if youtube_data.get("ShortDescription"):
+        parts.append(youtube_data["ShortDescription"])
+        parts.append("")  # Blank line
+    
+    # Description body
+    if youtube_data.get("DescriptionBody"):
+        parts.append(youtube_data["DescriptionBody"])
+        parts.append("")  # Blank line
+    
+    # Topics section
+    topics = youtube_data.get("Topics", [])
+    if topics:
+        parts.append("Topics:")
+        for topic in topics:
+            start = topic.get("Start", "")
+            text = topic.get("Text", "")
+            parts.append(f"- {start} {text}")
+        parts.append("")  # Blank line
+    
+    # URLs section
+    urls = youtube_data.get("URLs", [])
+    if urls:
+        parts.append("URLs:")
+        for url in urls:
+            parts.append(f"- {url}")
+        parts.append("")  # Blank line
+    
+    # Hashtags
+    hashtags = youtube_data.get("Hashtags", [])
+    if hashtags:
+        # Add # symbol to each hashtag
+        hashtag_str = " ".join([f"#{tag}" for tag in hashtags])
+        parts.append(hashtag_str)
+    
+    return "\n".join(parts)

@@ -4,6 +4,7 @@ import google.auth.transport.requests
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from scripts import marketing_generator
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
@@ -32,12 +33,24 @@ def get_authenticated_service():
 
     return build('youtube', 'v3', credentials=creds)
 
-def publish_video(video_path, title, description, category_id="26", privacy_status="unlisted"):
+def publish_video(video_path, title, description_or_youtube_data, category_id="26", privacy_status="unlisted"):
     """
     Uploads a video to YouTube.
     Default category is 26 (How-to & Style).
     Default privacy is unlisted.
+    
+    Args:
+        video_path: Path to the video file
+        title: Video title
+        description_or_youtube_data: Either a string description (old format) or dict with YouTube data (new format)
+        category_id: YouTube category ID
+        privacy_status: Video privacy status
     """
+    # Assemble description if structured data is provided
+    if isinstance(description_or_youtube_data, dict):
+        description = marketing_generator.assemble_youtube_description(description_or_youtube_data)
+    else:
+        description = description_or_youtube_data
     if not os.path.exists(video_path):
         print(f"Error: Video file not found at {video_path}")
         return None
