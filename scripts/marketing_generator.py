@@ -39,6 +39,8 @@ class YouTubeMarketing(typing.TypedDict):
     URLs: list[str]
     Hashtags: list[str]
     CustomLinks: typing.NotRequired[list[CustomLinkEntry]]
+    CustomHashtags: typing.NotRequired[list[str]]
+
 
 
 class FacebookMarketing(typing.TypedDict):
@@ -204,9 +206,17 @@ def assemble_youtube_description(youtube_data):
     
     # Hashtags
     hashtags = youtube_data.get("Hashtags", [])
-    if hashtags:
+    custom_hashtags = youtube_data.get("CustomHashtags", [])
+    
+    # Precedence: If custom hashtags are provided, use them EXCLUSIVELY.
+    # Otherwise, fall back to discovered hashtags.
+    if custom_hashtags:
+        hashtag_str = " ".join([f"#{tag}" for tag in custom_hashtags])
+        parts.append(hashtag_str)
+    elif hashtags:
         # Add # symbol to each hashtag
         hashtag_str = " ".join([f"#{tag}" for tag in hashtags])
         parts.append(hashtag_str)
+
     
     return "\n".join(parts)

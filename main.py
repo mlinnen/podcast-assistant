@@ -25,7 +25,9 @@ def main():
     parser.add_argument("--publish", action="store_true", help="Publish the generated video to YouTube")
     parser.add_argument("--force-marketing", action="store_true", help="Force re-generation of marketing content")
     parser.add_argument("--link", action="append", help="Custom link to add to YouTube description (format: 'URL|Label')")
+    parser.add_argument("--hashtag", action="append", help="Custom hashtag to add to YouTube description (overrides generated tags)")
     parser.add_argument("-c", "--campaign", help="Optional campaign name to group output files")
+
 
 
     parser.add_argument("-e", "--episode", help="Optional episode name for subfolder under campaign")
@@ -195,6 +197,14 @@ def main():
                 if custom_links:
                     if "YouTube" in final_output["Publications"]:
                         final_output["Publications"]["YouTube"]["CustomLinks"] = custom_links
+                
+                # Add custom hashtags to YouTube data
+                if args.hashtag:
+                    if "YouTube" in final_output["Publications"]:
+                        # clean hashtags removing # if present
+                        cleaned_hashtags = [tag.replace("#", "") for tag in args.hashtag]
+                        final_output["Publications"]["YouTube"]["CustomHashtags"] = cleaned_hashtags
+
         else:
             print("Skipping marketing content generation (already exists).")
 

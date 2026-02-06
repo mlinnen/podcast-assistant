@@ -80,10 +80,17 @@ def export_review_document(transcription_data, output_dir):
 
                 
                 hashtags = youtube.get('Hashtags', [])
-                if hashtags:
+                custom_hashtags = youtube.get('CustomHashtags', [])
+                
+                if custom_hashtags:
+                    lines.append("**Hashtags** (Custom):\n\n")
+                    hashtag_str = " ".join([f"#{tag}" for tag in custom_hashtags])
+                    lines.append(f"{hashtag_str}\n\n")
+                elif hashtags:
                     lines.append("**Hashtags**:\n\n")
                     hashtag_str = " ".join([f"#{tag}" for tag in hashtags])
                     lines.append(f"{hashtag_str}\n\n")
+
                 
                 # Also show the final assembled description
                 from scripts import marketing_generator
