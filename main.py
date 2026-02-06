@@ -338,7 +338,11 @@ def main():
                 if os.path.exists(pdf_path):
                     files_to_upload.append(pdf_path)
             
-            # 3. Images (Square & Thumbnail)
+            # 3. JSON Output
+            if 'json_path' in locals() and json_path and os.path.exists(json_path):
+                files_to_upload.append(json_path)
+
+            # 4. Images (Square & Thumbnail)
             base_name = os.path.splitext(os.path.basename(audio_path))[0]
             
             # Square Image
@@ -358,6 +362,20 @@ def main():
             for img_path in potential_images:
                 if os.path.exists(img_path):
                      files_to_upload.append(img_path)
+
+            # 5. Video File
+            # Check if video info is in final_output
+            if "Publications" in final_output and "Video" in final_output["Publications"]:
+                video_filename = final_output["Publications"]["Video"].get("VideoFile")
+                if video_filename:
+                    video_full_path = os.path.join(output_dir, video_filename)
+                    if os.path.exists(video_full_path):
+                        files_to_upload.append(video_full_path)
+            # Fallback: check based on common naming convention if not in metadata or metadata fails
+            else:
+                 video_fallback = os.path.join(output_dir, f"{base_name}.mp4")
+                 if os.path.exists(video_fallback) and video_fallback not in files_to_upload:
+                     files_to_upload.append(video_fallback)
 
             drive_uploader.upload_episode_assets(campaign_name, episode_name, files_to_upload, root_folder_name=args.drive_root)
 
