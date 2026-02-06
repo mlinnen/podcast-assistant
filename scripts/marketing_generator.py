@@ -182,9 +182,10 @@ def assemble_youtube_description(youtube_data):
     urls = youtube_data.get("URLs", [])
     custom_links = youtube_data.get("CustomLinks", [])
     
-    if urls or custom_links:
+    # Precedence: If custom links are provided, use them EXCLUSIVELY.
+    # Otherwise, fall back to discovered URLs.
+    if custom_links:
         parts.append("URLs:")
-        # Show custom links first
         for link in custom_links:
             url = link.get("Url", "")
             label = link.get("Label", "")
@@ -192,11 +193,13 @@ def assemble_youtube_description(youtube_data):
                 parts.append(f"- {label}: {url}")
             else:
                 parts.append(f"- {url}")
-                
-        # Show discovered links
+        parts.append("")  # Blank line
+    elif urls:
+        parts.append("URLs:")
         for url in urls:
             parts.append(f"- {url}")
         parts.append("")  # Blank line
+
 
     
     # Hashtags
