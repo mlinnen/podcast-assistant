@@ -214,21 +214,35 @@ def main():
                 if custom_links:
                     if "YouTube" in final_output["Publications"]:
                         final_output["Publications"]["YouTube"]["CustomLinks"] = custom_links
+            
+            # Add custom hashtags if provided (either new or existing publications)
+            if args.hashtag:
+                # support multiple hashtags in a single flag by splitting on whitespace
+                tags = []
+                for tag_arg in args.hashtag:
+                    # Remove # and split by whitespace
+                    cleaned = tag_arg.replace("#", " ")
+                    tags.extend(cleaned.split())
                 
-                # Add custom hashtags to YouTube data
-                if args.hashtag:
-                    if "YouTube" in final_output["Publications"]:
-                        # support multiple hashtags in a single flag by splitting on whitespace
-                        all_tags = []
-                        for tag_arg in args.hashtag:
-                            # Remove # and split by whitespace
-                            cleaned = tag_arg.replace("#", " ")
-                            all_tags.extend(cleaned.split())
-                        
-                        final_output["Publications"]["YouTube"]["CustomHashtags"] = all_tags
+                if "Publications" in final_output:
+                    for platform in ["YouTube", "Facebook", "Spotify"]:
+                        if platform in final_output["Publications"]:
+                            final_output["Publications"][platform]["CustomHashtags"] = tags
 
         else:
             print("Skipping marketing content generation (already exists).")
+            # Even if we skip generation, still apply custom hashtags if they are new/changed
+            if args.hashtag:
+                tags = []
+                for tag_arg in args.hashtag:
+                    cleaned = tag_arg.replace("#", " ")
+                    tags.extend(cleaned.split())
+                
+                if "Publications" in final_output:
+                    for platform in ["YouTube", "Facebook", "Spotify"]:
+                        if platform in final_output["Publications"]:
+                            final_output["Publications"][platform]["CustomHashtags"] = tags
+
 
         
         # Create output directory once for all subsequent file operations

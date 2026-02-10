@@ -104,18 +104,52 @@ def export_review_document(transcription_data, output_dir):
             
         facebook = publications.get("Facebook", {})
         if facebook:
-            post = facebook.get('Post', 'N/A')
             lines.append("### Facebook")
             lines.append("This is what will be posted on Facebook\n\n")
-            lines.append(f"**Description**:\n\n{post}\n\n")
+            lines.append(f"**Post Body**:\n\n{facebook.get('Post', 'N/A')}\n\n")
+            
+            hashtags = facebook.get('Hashtags', [])
+            custom_hashtags = facebook.get('CustomHashtags', [])
+            
+            if custom_hashtags:
+                lines.append("**Hashtags** (Custom):\n\n")
+                hashtag_str = " ".join([f"#{tag}" for tag in custom_hashtags])
+                lines.append(f"{hashtag_str}\n\n")
+            elif hashtags:
+                lines.append("**Hashtags**:\n\n")
+                hashtag_str = " ".join([f"#{tag}" for tag in hashtags])
+                lines.append(f"{hashtag_str}\n\n")
+
+            # Final assembled post
+            from scripts import marketing_generator
+            assembled = marketing_generator.assemble_facebook_post(facebook)
+            lines.append("**Final Assembled Post**:\n\n")
+            lines.append(f"```\n{assembled}\n```\n\n")
 
         spotify = publications.get("Spotify", {})
         if spotify:
-            description = spotify.get('Description', 'N/A')
             lines.append("### Spotify")
             lines.append("This is what will be posted on Spotify\n\n")
             lines.append(f"**Title**:\n\n{spotify.get('Title', 'N/A')}\n\n")
-            lines.append(f"**Description**:\n\n{description}\n\n")
+            lines.append(f"**Description Body**:\n\n{spotify.get('Description', 'N/A')}\n\n")
+            
+            hashtags = spotify.get('Hashtags', [])
+            custom_hashtags = spotify.get('CustomHashtags', [])
+            
+            if custom_hashtags:
+                lines.append("**Hashtags** (Custom):\n\n")
+                hashtag_str = " ".join([f"#{tag}" for tag in custom_hashtags])
+                lines.append(f"{hashtag_str}\n\n")
+            elif hashtags:
+                lines.append("**Hashtags**:\n\n")
+                hashtag_str = " ".join([f"#{tag}" for tag in hashtags])
+                lines.append(f"{hashtag_str}\n\n")
+
+            # Final assembled description
+            from scripts import marketing_generator
+            assembled = marketing_generator.assemble_spotify_description(spotify)
+            lines.append("**Final Assembled Description**:\n\n")
+            lines.append(f"```\n{assembled}\n```\n\n")
 
     lines.append("## Transcript\n")
     

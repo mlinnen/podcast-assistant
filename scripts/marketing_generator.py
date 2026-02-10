@@ -45,10 +45,14 @@ class YouTubeMarketing(typing.TypedDict):
 
 class FacebookMarketing(typing.TypedDict):
     Post: str
+    Hashtags: list[str]
+    CustomHashtags: typing.NotRequired[list[str]]
 
 class SpotifyMarketing(typing.TypedDict):
     Title: str
     Description: str
+    Hashtags: list[str]
+    CustomHashtags: typing.NotRequired[list[str]]
 
 class MarketingContent(typing.TypedDict):
     YouTube: YouTubeMarketing
@@ -57,7 +61,7 @@ class MarketingContent(typing.TypedDict):
 
 def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-flash-preview"):
     """
-    Generates YouTube and Facebook marketing content using Gemini.
+    Generates YouTube, Facebook, and Spotify marketing content using Gemini.
     """
     client = genai.Client(api_key=api_key)
     
@@ -69,30 +73,32 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
     prompt = f"""
     You are a world-class marketing expert specializing in social media growth and SEO.
     
-    Based on the following transcript text and identified topics, generate marketing content for YouTube and Facebook.
+    Based on the following transcript text and identified topics, generate marketing content for YouTube, Facebook, and Spotify.
     
     YOUTUBE REQUIREMENTS:
     - Title: Catchy, attention-grabbing, and optimized for search.
     - ShortDescription: A brief hook (1-2 sentences) that summarizes the content. This appears before the "Show more" button on YouTube.
-    - DescriptionBody: A detailed, compelling summary with proper formatting. Use literal '\n' characters for line breaks.
+    - DescriptionBody: A detailed, compelling summary with proper formatting. Use literal '\\n' characters for line breaks.
     - Topics: An array of topic objects, each with "Start" (timestamp) and "Text" (topic description) fields. Use the provided topics array below as the source.
     - URLs: An array of all URLs mentioned in the transcript. Each URL MUST be prefixed with 'https://' (e.g., https://google.com). If no URLs are mentioned, return an empty array.
     - Hashtags: An array of 3-5 relevant hashtags (without the # symbol, just the text).
     
     FACEBOOK REQUIREMENTS:
-    - Post: A compelling post for Facebook.
+    - Post: A compelling post for Facebook. Focus on engagement and storytelling.
     - IMPORTANT: Do NOT include any actual URLs extracted from the text in the Facebook post.
-    - Focus on engagement and storytelling.
-    - IMPORTANT: Use literal '\n' characters to create line breaks and separate sections (e.g., Summary, Topics, URLs, Hashtags).
+    - IMPORTANT: Do NOT include hashtags in the 'Post' field.
+    - IMPORTANT: Do NOT include the YouTube URL placeholder in the 'Post' field.
+    - IMPORTANT: Use literal '\\n' characters to create line breaks and separate sections.
     - IMPORTANT: Avoid using em-dashes (—) or extra dashes between words. Use standard punctuation (commas, periods, or colons) instead.
-    - Include 2-3 relevant hashtags at the end.
-    - AFTER the hashtags, on a new line, add the placeholder text "[INSERT YOUTUBE URL HERE]".
+    - Hashtags: An array of 2-3 relevant hashtags (without the # symbol, just the text).
     
     SPOTIFY REQUIREMENTS:
     - Title: Use the exact same title as the YouTube Title.
     - Description: A detailed and professional show notes summary.
+    - IMPORTANT: Do NOT include hashtags in the 'Description' field.
     - Include topics (using a hyphen '-' as the bullet point for each item) and any relevant links.
-    - IMPORTANT: Use literal '\n' characters to create line breaks.
+    - IMPORTANT: Use literal '\\n' characters to create line breaks.
+    - Hashtags: An array of 3-5 relevant hashtags (without the # symbol, just the text).
     
     {topics_context}
     
@@ -113,11 +119,13 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
             "Hashtags": ["Keyword1", "Keyword2", "Keyword3"]
         }},
         "Facebook": {{
-            "Post": "..."
+            "Post": "...",
+            "Hashtags": ["Keyword1", "Keyword2"]
         }},
         "Spotify": {{
             "Title": "...",
-            "Description": "..."
+            "Description": "...",
+            "Hashtags": ["Keyword1", "Keyword2", "Keyword3"]
         }}
     }}
     """
@@ -141,6 +149,7 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
         result["Spotify"]["Description"] = ensure_url_protocol(result["Spotify"]["Description"])
         
     return result
+
 
 def assemble_youtube_description(youtube_data):
     """
@@ -220,3 +229,52 @@ def assemble_youtube_description(youtube_data):
 
     
     return "\n".join(parts)
+
+def assemble_facebook_post(facebook_data):
+    """
+    Assembles a formatted Facebook post from structured data.
+    """
+    parts = []
+    
+    # Post content
+    if facebook_data.get("Post"):
+        parts.append(facebook_data["Post"])
+        parts.append("")  # Blank line
+
+    # Hashtags
+    hashtags = facebook_data.get("Hashtags", [])
+    custom_hashtags = facebook_data.get("CustomHashtags", [])
+    
+    selected_hashtags = custom_hashtags if custom_hashtags else hashtags
+    if selected_hashtags:
+        hashtag_str = " ".join([f"#{tag}" for tag in selected_hashtags])
+        parts.append(hashtag_str)
+        parts.append("")  # Blank line
+        
+    # YouTube URL placeholder
+    parts.append("[INSERT YOUTUBE URL HERE]")
+    
+    return "\n".join(parts)
+
+def assemble_spotify_description(spotify_data):
+    """
+    Assembles a formatted Spotify description from structured data.
+    """
+    parts = []
+    
+    # Description content
+    if spotify_data.get("Description"):
+        parts.append(spotify_data["Description"])
+        parts.append("")  # Blank line
+
+    # Hashtags
+    hashtags = spotify_data.get("Hashtags", [])
+    custom_hashtags = spotify_data.get("CustomHashtags", [])
+    
+    selected_hashtags = custom_hashtags if custom_hashtags else hashtags
+    if selected_hashtags:
+        hashtag_str = " ".join([f"#{tag}" for tag in selected_hashtags])
+        parts.append(hashtag_str)
+    
+    return "\n".join(parts)
+
