@@ -47,6 +47,7 @@ class FacebookMarketing(typing.TypedDict):
     Post: str
     Hashtags: list[str]
     CustomHashtags: typing.NotRequired[list[str]]
+    YouTubeURL: typing.NotRequired[str]
 
 class SpotifyMarketing(typing.TypedDict):
     Title: str
@@ -251,8 +252,9 @@ def assemble_facebook_post(facebook_data):
         parts.append(hashtag_str)
         parts.append("")  # Blank line
         
-    # YouTube URL placeholder
-    parts.append("[INSERT YOUTUBE URL HERE]")
+    # YouTube URL
+    youtube_url = facebook_data.get("YouTubeURL", "[INSERT YOUTUBE URL HERE]")
+    parts.append(youtube_url)
     
     return "\n".join(parts)
 
