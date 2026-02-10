@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import json
+from datetime import datetime
 from dotenv import load_dotenv
 from scripts import transcriber
 from scripts import file_ops
@@ -133,6 +134,18 @@ def main():
             except Exception as e:
                 print(f"Warning: Could not load existing JSON ({e}). Starting fresh.")
                 final_output = {}
+
+
+        # Capture Run Metadata
+        run_params = vars(args).copy()
+        # Remove sensitive data if present
+        if 'api_key' in run_params:
+            del run_params['api_key']
+        
+        final_output["RunMetaData"] = {
+            "ExecutionTime": datetime.now().isoformat(),
+            "Parameters": run_params
+        }
 
         # 1. Get File Metadata
         if not all(k in final_output for k in ["FileName", "FileSize", "DateCreated"]):
