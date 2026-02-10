@@ -145,6 +145,25 @@ def export_review_document(transcription_data, output_dir):
                 hashtag_str = " ".join([f"#{tag}" for tag in hashtags])
                 lines.append(f"{hashtag_str}\n\n")
 
+            urls = spotify.get('URLs', [])
+            custom_links = spotify.get('CustomLinks', [])
+            
+            if custom_links:
+                lines.append("**URLs** (Custom):\n\n")
+                for link in custom_links:
+                    url = link.get('Url', '')
+                    label = link.get('Label', '')
+                    if label and label != url:
+                        lines.append(f"- {label}: {url}\n")
+                    else:
+                        lines.append(f"- {url}\n")
+                lines.append("\n")
+            elif urls:
+                lines.append("**URLs** (Discovered):\n\n")
+                for url in urls:
+                    lines.append(f"- {url}\n")
+                lines.append("\n")
+
             # Final assembled description
             from scripts import marketing_generator
             assembled = marketing_generator.assemble_spotify_description(spotify)

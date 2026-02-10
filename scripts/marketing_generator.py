@@ -53,7 +53,9 @@ class SpotifyMarketing(typing.TypedDict):
     Title: str
     Description: str
     Hashtags: list[str]
+    URLs: list[str]
     CustomHashtags: typing.NotRequired[list[str]]
+    CustomLinks: typing.NotRequired[list[CustomLinkEntry]]
 
 class MarketingContent(typing.TypedDict):
     YouTube: YouTubeMarketing
@@ -126,7 +128,8 @@ def generate_marketing_content(text, api_key, topics=None, model_name="gemini-3-
         "Spotify": {{
             "Title": "...",
             "Description": "...",
-            "Hashtags": ["Keyword1", "Keyword2", "Keyword3"]
+            "Hashtags": ["Keyword1", "Keyword2", "Keyword3"],
+            "URLs": ["https://example.com"]
         }}
     }}
     """
@@ -267,6 +270,27 @@ def assemble_spotify_description(spotify_data):
     # Description content
     if spotify_data.get("Description"):
         parts.append(spotify_data["Description"])
+        parts.append("")  # Blank line
+
+    # URLs section
+    urls = spotify_data.get("URLs", [])
+    custom_links = spotify_data.get("CustomLinks", [])
+    
+    # Precedence: If custom links are provided, use them EXCLUSIVELY.
+    if custom_links:
+        parts.append("Links:")
+        for link in custom_links:
+            url = link.get("Url", "")
+            label = link.get("Label", "")
+            if label and label != url:
+                parts.append(f"- {label}: {url}")
+            else:
+                parts.append(f"- {url}")
+        parts.append("")  # Blank line
+    elif urls:
+        parts.append("Links:")
+        for url in urls:
+            parts.append(f"- {url}")
         parts.append("")  # Blank line
 
     # Hashtags

@@ -217,10 +217,12 @@ def main():
                     final_output["Publications"] = {}
                 final_output["Publications"].update(marketing_content)
                 
-                # Add custom links to YouTube data
+                # Add custom links to YouTube and Spotify data
                 if custom_links:
                     if "YouTube" in final_output["Publications"]:
                         final_output["Publications"]["YouTube"]["CustomLinks"] = custom_links
+                    if "Spotify" in final_output["Publications"]:
+                        final_output["Publications"]["Spotify"]["CustomLinks"] = custom_links
             
             # Add custom hashtags if provided (either new or existing publications)
             if args.hashtag:
