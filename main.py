@@ -218,9 +218,14 @@ def main():
                 # Add custom hashtags to YouTube data
                 if args.hashtag:
                     if "YouTube" in final_output["Publications"]:
-                        # clean hashtags removing # if present
-                        cleaned_hashtags = [tag.replace("#", "") for tag in args.hashtag]
-                        final_output["Publications"]["YouTube"]["CustomHashtags"] = cleaned_hashtags
+                        # support multiple hashtags in a single flag by splitting on whitespace
+                        all_tags = []
+                        for tag_arg in args.hashtag:
+                            # Remove # and split by whitespace
+                            cleaned = tag_arg.replace("#", " ")
+                            all_tags.extend(cleaned.split())
+                        
+                        final_output["Publications"]["YouTube"]["CustomHashtags"] = all_tags
 
         else:
             print("Skipping marketing content generation (already exists).")
