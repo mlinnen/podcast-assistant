@@ -80,7 +80,7 @@ def find_or_create_folder(drive_service, folder_name, parent_id=None):
         print(f"Created folder: {folder_name} ({folder.get('id')})")
         return folder.get('id')
 
-def upload_file(drive_service, file_path, folder_id):
+def upload_file(drive_service, file_path, folder_id, overwrite=False):
     """
     Uploads a file to a specific folder on Google Drive.
     """
@@ -95,20 +95,26 @@ def upload_file(drive_service, file_path, folder_id):
     response = drive_service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
     existing_files = response.get('files', [])
     
-    if existing_files:
-        print(f"File {file_name} already exists on Drive. Skipping/Overwriting logic could be added here.")
-        # For now, let's just update the existing file or skip?
-        # Let's skip to be safe, or notify. 
-        # User request was "upload", often implies "put it there". 
-        # We will skip to avoid duplicates for now.
-        print(f"File {file_name} already exists. Skipping.")
-        return existing_files[0]['id']
-
-    print(f"Uploading {file_name}...")
     mime_type, _ = mimetypes.guess_type(file_path)
     if mime_type is None:
         mime_type = 'application/octet-stream'
 
+    if existing_files:
+        file_id = existing_files[0]['id']
+        if overwrite:
+            print(f"File {file_name} already exists. Overwriting content...")
+            media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
+            updated_file = drive_service.files().update(
+                fileId=file_id,
+                media_body=media
+            ).execute()
+            print(f"Updated {file_name} ({updated_file.get('id')})")
+            return updated_file.get('id')
+        else:
+            print(f"File {file_name} already exists. Skipping.")
+            return file_id
+
+    print(f"Uploading {file_name}...")
     file_metadata = {
         'name': file_name,
         'parents': [folder_id]
@@ -119,11 +125,14 @@ def upload_file(drive_service, file_path, folder_id):
     print(f"Uploaded {file_name} ({file.get('id')})")
     return file.get('id')
 
-def upload_episode_assets(campaign_name, episode_name, files_to_upload, root_folder_name="podcasts"):
+def upload_episode_assets(campaign_name, episode_name, files_to_upload, root_folder_name="podcasts", files_to_overwrite=None):
     """
     Main function to handle uploading of assets for a specific episode.
     Hierarchy: Root (default="podcasts") -> Campaign -> Episode
     """
+    if files_to_overwrite is None:
+        files_to_overwrite = set()
+    
     try:
         service = get_authenticated_service()
         
@@ -139,7 +148,8 @@ def upload_episode_assets(campaign_name, episode_name, files_to_upload, root_fol
         # 4. Upload Files
         for file_path in files_to_upload:
             if file_path:
-                upload_file(service, file_path, episode_folder_id)
+                should_overwrite = file_path in files_to_overwrite
+                upload_file(service, file_path, episode_folder_id, overwrite=should_overwrite)
                 
         print("Google Drive upload complete.")
         return True

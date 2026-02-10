@@ -343,6 +343,7 @@ def main():
 
             # Identify files to upload
             files_to_upload = []
+            files_to_overwrite = set()
             
             # 1. Original Audio File
             files_to_upload.append(audio_path)
@@ -351,11 +352,13 @@ def main():
             if 'review_file' in locals() and review_file:
                 md_path = os.path.join(output_dir, review_file)
                 files_to_upload.append(md_path) # MD
+                files_to_overwrite.add(md_path)
                 
                 # PDF (assume same base name)
                 pdf_path = os.path.splitext(md_path)[0] + ".pdf"
                 if os.path.exists(pdf_path):
                     files_to_upload.append(pdf_path)
+                    files_to_overwrite.add(pdf_path)
             
             # 3. JSON Output
             if 'json_path' in locals() and json_path and os.path.exists(json_path):
@@ -384,9 +387,9 @@ def main():
             else:
                  video_fallback = os.path.join(output_dir, f"{base_name}.mp4")
                  if os.path.exists(video_fallback) and video_fallback not in files_to_upload:
-                     files_to_upload.append(video_fallback)
+                      files_to_upload.append(video_fallback)
 
-            drive_uploader.upload_episode_assets(campaign_name, episode_name, files_to_upload, root_folder_name=args.drive_root)
+            drive_uploader.upload_episode_assets(campaign_name, episode_name, files_to_upload, root_folder_name=args.drive_root, files_to_overwrite=files_to_overwrite)
 
 
         
