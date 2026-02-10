@@ -142,10 +142,17 @@ def main():
         if 'api_key' in run_params:
             del run_params['api_key']
         
-        final_output["RunMetaData"] = {
+        # Initialize or Migrate RunMetaData to a list
+        if "RunMetaData" not in final_output:
+            final_output["RunMetaData"] = []
+        elif isinstance(final_output["RunMetaData"], dict):
+            # Migrate old single-run format to a list
+            final_output["RunMetaData"] = [final_output["RunMetaData"]]
+            
+        final_output["RunMetaData"].append({
             "ExecutionTime": datetime.now().isoformat(),
             "Parameters": run_params
-        }
+        })
 
         # 1. Get File Metadata
         if not all(k in final_output for k in ["FileName", "FileSize", "DateCreated"]):
