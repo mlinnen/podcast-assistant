@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--video", help="Path to an image file to create a video from the audio")
     parser.add_argument("--publish", action="store_true", help="Publish the generated video to YouTube")
     parser.add_argument("--force-marketing", action="store_true", help="Force re-generation of marketing content")
+    parser.add_argument("--force-transcript", action="store_true", help="Force re-generation of transcript and all downstream artifacts")
     parser.add_argument("--link", action="append", help="Custom link to add to YouTube description (format: 'URL|Label')")
     parser.add_argument("--hashtag", action="append", help="Custom hashtag to add to YouTube description (overrides generated tags)")
     parser.add_argument("--upload-drive", action="store_true", help="Upload valid output files to Google Drive")
@@ -134,7 +135,27 @@ def main():
             except Exception as e:
                 print(f"Warning: Could not load existing JSON ({e}). Starting fresh.")
                 final_output = {}
-
+        
+        # 0. Handle Force Transcript Regeneration
+        if args.force_transcript:
+            print("Force-regenerating transcript and downstream artifacts...")
+            # Preserve YouTubeVideoID if it exists to allow for overwriting
+            youtube_video_id = None
+            if "Publications" in final_output and "Video" in final_output["Publications"]:
+                youtube_video_id = final_output["Publications"]["Video"].get("YouTubeVideoID")
+            
+            # Clear downstream data
+            final_output.pop("Dialog", None)
+            final_output.pop("Topics", None)
+            final_output.pop("Publications", None)
+            
+            # Re-insert YouTubeVideoID in the correct structure if it existed
+            if youtube_video_id:
+                final_output["Publications"] = {
+                    "Video": {
+                        "YouTubeVideoID": youtube_video_id
+                    }
+                }
 
         # Capture Run Metadata
         run_params = vars(args).copy()

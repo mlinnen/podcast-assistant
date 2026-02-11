@@ -115,6 +115,7 @@ The tool will automatically look for `audio.wav` in the campaign folder if it is
 | `--video` | Path to an image file to create a video from the audio | - |
 | `--publish` | Publish the generated video to YouTube (requires setup) | `False` |
 | `--force-marketing` | Force re-generation of marketing content (YouTube/Facebook/Spotify) | `False` |
+| `--force-transcript` | Force re-generation of transcript and all downstream artifacts | `False` |
 | `--api-key` | Google API Key (can also set via `GOOGLE_API_KEY` env var) | - |
 | `-c`, `--campaign` | Campaign name to organize output files | - |
 | `-e`, `--episode` | Episode name (subfolder under campaign) | - |
