@@ -41,6 +41,7 @@ def create_video(audio_path, image_path, output_dir):
     # -i audio_path: Input audio
     # -c:v libx264: Video codec
     # -tune stillimage: Tune for still image
+    # -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2": Ensure dimensions are even for compatibility
     # -c:a aac: Audio codec
     # -b:a 192k: Audio bitrate
     # -pix_fmt yuv420p: Pixel format for compatibility
@@ -53,6 +54,7 @@ def create_video(audio_path, image_path, output_dir):
         "-i", audio_path,
         "-c:v", "libx264",
         "-tune", "stillimage",
+        "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2",
         "-c:a", "aac",
         "-b:a", "192k",
         "-pix_fmt", "yuv420p",
