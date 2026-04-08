@@ -139,22 +139,20 @@ def main():
         # 0. Handle Force Transcript Regeneration
         if args.force_transcript:
             print("Force-regenerating transcript and downstream artifacts...")
-            # Preserve YouTubeVideoID if it exists to allow for overwriting
-            youtube_video_id = None
+            # Preserve Video info if it exists to allow for overwriting and avoiding re-creation
+            video_info = None
             if "Publications" in final_output and "Video" in final_output["Publications"]:
-                youtube_video_id = final_output["Publications"]["Video"].get("YouTubeVideoID")
+                video_info = final_output["Publications"]["Video"]
             
             # Clear downstream data
             final_output.pop("Dialog", None)
             final_output.pop("Topics", None)
             final_output.pop("Publications", None)
             
-            # Re-insert YouTubeVideoID in the correct structure if it existed
-            if youtube_video_id:
+            # Re-insert Video info if it existed
+            if video_info:
                 final_output["Publications"] = {
-                    "Video": {
-                        "YouTubeVideoID": youtube_video_id
-                    }
+                    "Video": video_info
                 }
 
         # Capture Run Metadata
@@ -303,10 +301,14 @@ def main():
                 if video_path:
                     if "Publications" not in final_output:
                         final_output["Publications"] = {}
-                    final_output["Publications"]["Video"] = {
+                    
+                    if "Video" not in final_output["Publications"]:
+                        final_output["Publications"]["Video"] = {}
+                        
+                    final_output["Publications"]["Video"].update({
                         "VideoFile": os.path.basename(video_path),
                         "ImageFile": os.path.basename(args.video)
-                    }
+                    })
             else:
                 print("Skipping video creation (already exists).")
 
