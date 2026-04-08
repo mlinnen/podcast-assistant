@@ -1,6 +1,7 @@
 import os
 import pickle
 import mimetypes
+import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -90,9 +91,15 @@ def upload_file(drive_service, file_path, folder_id, overwrite=False):
 
     file_name = os.path.basename(file_path)
     
+    # Get local modification time
+    local_mtime = os.path.getmtime(file_path)
+    local_mtime_dt = datetime.datetime.fromtimestamp(local_mtime, datetime.timezone.utc)
+    # Drive API uses RFC 3339 format, we'll format ours to match (e.g. 2023-10-27T10:00:00.000Z)
+    local_mtime_rfc3339 = local_mtime_dt.isoformat(timespec='milliseconds').replace("+00:00", "Z")
+
     # Check if file already exists in the folder to avoid duplicates
     query = f"name='{file_name}' and '{folder_id}' in parents and trashed=false"
-    response = drive_service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
+    response = drive_service.files().list(q=query, spaces='drive', fields='files(id, name, modifiedTime)').execute()
     existing_files = response.get('files', [])
     
     mime_type, _ = mimetypes.guess_type(file_path)
@@ -101,23 +108,45 @@ def upload_file(drive_service, file_path, folder_id, overwrite=False):
 
     if existing_files:
         file_id = existing_files[0]['id']
-        if overwrite:
+        drive_mtime_str = existing_files[0].get('modifiedTime')
+        
+        # If overwrite is False, check if the timestamps differ
+        should_update = overwrite
+        if not should_update and drive_mtime_str:
+            try:
+                # Drive timestamps often have .000Z or similar
+                # Use fromisoformat for reliable parsing (3.7+)
+                drive_mtime_dt = datetime.datetime.fromisoformat(drive_mtime_str.replace('Z', '+00:00'))
+                
+                # Compare. We use a threshold (e.g. 1 second) to avoid precision issues
+                if abs((local_mtime_dt - drive_mtime_dt).total_seconds()) > 1:
+                    print(f"File {file_name} has changed locally. Updating Drive version...")
+                    should_update = True
+            except Exception as e:
+                print(f"Warning: Could not compare timestamps for {file_name}: {e}")
+
+        if should_update:
             print(f"File {file_name} already exists. Overwriting content...")
+            # Set modifiedTime on Drive to match local
+            file_metadata = {'modifiedTime': local_mtime_rfc3339}
             media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
             updated_file = drive_service.files().update(
                 fileId=file_id,
-                media_body=media
+                body=file_metadata,
+                media_body=media,
+                setModifiedTime=True
             ).execute()
             print(f"Updated {file_name} ({updated_file.get('id')})")
             return updated_file.get('id')
         else:
-            print(f"File {file_name} already exists. Skipping.")
+            print(f"File {file_name} already exists and is up to date. Skipping.")
             return file_id
 
     print(f"Uploading {file_name}...")
     file_metadata = {
         'name': file_name,
-        'parents': [folder_id]
+        'parents': [folder_id],
+        'modifiedTime': local_mtime_rfc3339
     }
     media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
     
